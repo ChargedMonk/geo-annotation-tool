@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Geo-Annotation-Tool</title>
+    <link rel="shortcut icon" href="#" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="styles/base.css">
+</head>
+
+<body>
+    <nav class="navbar bg-body-tertiary d-flex justify-content-evenly" id="navbar">
+        <div class="ms-4 d-flex">
+            <input type="file" class="form-control" id="img_upload" aria-describedby="img_upload" aria-label="Upload"
+                multiple>
+        </div>
+        <div class="mx-auto d-flex">
+            <input type="file" class="form-control" id="annotations_upload" aria-describedby="annotations_upload"
+                aria-label="Upload">
+        </div>
+        <div class="me-4">
+            <button class="btn btn-dark px-5" id="save_btn">Save&nbsp;&nbsp;&nbsp;<i class="bi bi-download"></i>
+            </button>
+        </div>
+    </nav>
+    <div class="d-flex justify-content-evenly content-area">
+        <div class="img-block m-2" id="img_container">
+            <div class="spinner-border text-primary hide" role="status" id="spinner">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <img class="img-fluid" alt="image" id="img">
+            <div class="drag-rect" id="dragRect"></div>
+        </div>
+        <div class="annotation-block m-2">
+            <ul class="nav nav-pills nav-justified d-flex justify-content-evenly mx-5 mb-4" id="annotate_tabs">
+                <li class="nav-item" id="key_value_tab_btn">
+                    <span class="nav-link active link-span">Links</span>
+                </li>
+            </ul>
+            <div id="key_value_tab">
+                <div class="row m-1 gy-1 gx-1 key_value">
+                    <div class="col-1 p-0">
+                        <button type="button" class="btn delete_key_value_btn"><i class="bi bi-trash"></i></button>
+                    </div>
+                    <div class="col-3 flex-grow-1">
+                        <input class="form-control standard-key-dropdown invalid-input" list="standardKeyOptionsList"
+                            placeholder="Standard Key" aria-label="Standard Key">
+                    </div>
+                    <div class="col-3 flex-grow-1">
+                        <input type="text" class="form-control field_to_be_annotated key" placeholder="Key"
+                            aria-label="Key">
+                    </div>
+                    <div class="col-3 flex-grow-1">
+                        <input type="text" class="form-control  field_to_be_annotated value" placeholder="Value"
+                            aria-label="Value">
+                    </div>
+                    <div class="col-1 p-0">
+                        <button type="button" class="btn add_key_value_btn"><i class="bi bi-plus-lg"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <datalist id="standardKeyOptionsList">
+        <option value="SHIPPER">
+        <option value="CONSIGNEE">
+        <option value="RECEIVER">
+        <option value="SHIP_TO">
+        <option value="SELLER">
+        <option value="MANUFACTURER">
+        <option value="STUFFER">
+        <option value="CONSOLIDATOR">
+            <!-- Full Text Key -->
+        <option value="Full Text">
+        <option value="BILL OF LADING">
+        <option value="MASTER BILL OF LADING">
+        <option value="AMS BL">
+        <option value="CONTRACT OF CARRIAGE">
+        <option value="VESSEL VOYAGE">
+        <option value="INVOICE NUMBER">
+        <option value="VESSEL">
+        <option value="VOYAGE">
+        <option value="FIRMS CODE">
+        <option value="PLACE OF DELIVERY">
+        <option value="ETA">
+        <option value="ETD">
+        <option value="ORIGIN COUNTRY">
+        <option value="ORIGIN PORT">
+        <option value="EXPORT COUNTRY">
+        <option value="PHONE NO">
+        <option value="FAX">
+        <option value="CONTACT">
+        <option value="EMAIL">
+        <option value="DESTINATION PORT">
+        <option value="CARGO LOCATION">
+        <option value="CY LOCATION">
+        <option value="CARRIER">
+        <option value="IT NUMBER">
+        <option value="IT DATE">
+        <option value="ATTN">
+        <option value="NET WEIGHT">
+        <option value="GROSS WEIGHT">
+        <option value="INVOICE DATE">
+        <option value="INCOTERM">
+        <option value="INVOICE TOTAL">
+        <option value="CARGO CONTROL NUMBER">
+        <option value="OFFICE NUMBER">
+        <option value="UNLADING PORT">
+        <option value="US PORT OF EXIT">
+        <option value="FLIGHT">
+        <option value="SCAC CODE">
+        <option value="HTS NUMBER">
+        <option value="PRODUCT DESCRIPTION">
+        <option value="CONTAINER NUMBER">
+        <option value="CONTAINER SIZE">
+        <option value="SEAL NUMBER">
+        <option value="PO NUMBER">
+        <option value="CARRIER CODE">
+        <option value="TRUCK NUMBER">
+        <option value="LADING PORT">
+        <option value="GATC FREIGHT FORWARDER">
+        <option value="GATC PRODUCT">
+        <option value="GATC TOTES">
+        <option value="GATC BAGS">
+        <option value="GATC SHORTENING POWDER">
+        <option value="BUYER">
+        <option value="IMPORTER">
+        <option value="NOTIFY_PARTY">
+        <option value="CITY">
+        <option value="STATE">
+        <option value="POSTAL_CODE">
+        <option value="COUNTRY">
+        <option value="STREET_NUMBER">
+        <option value="STREET_NAME">
+        <option value="ORG_NAME">
+        <option value="UNSTRUCTURED_STREET_ADDRESS">
+        <option value="SKU">
+        <option value="QUANTITY">
+        <option value="NUMBER OF PACKAGES">
+        <option value="UNIT PRICE">
+        <option value="LINE ITEM TOTAL">
+        <option value="UOM">
+        <option value="PACKAGE TYPE">
+        <option value="ITEM CONTAINER NUMBER">
+        <option value="ITEM PO NUMBER">
+            <!-- MISC KEY -->
+        <option value="MISC">
+    </datalist>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <script src="scripts/leader-line.min.js" crossorigin="anonymous"></script>
+    <script type="module" src="scripts/common.js" crossorigin="anonymous"></script>
+    <script type="module" src="scripts/link_annotation.js" crossorigin="anonymous"></script>
+    <script type="module" src="scripts/load_annotations.js" crossorigin="anonymous"></script>
+</body>
+
+</html>
