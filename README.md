@@ -2,7 +2,7 @@
 
 
 ### Usage
-- Navigate to kn-geo-annotation-tool directory: `cd geo-annotation-tool`
+- Navigate to geo-annotation-tool directory: `cd geo-annotation-tool`
 - Install dependencies: `pip install requirements.txt`
 - Run the server: `python src\main.py`
 - Open the [http://localhost:8080/](http://localhost:8080/) on your browser
