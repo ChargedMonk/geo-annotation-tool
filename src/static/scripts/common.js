@@ -64,9 +64,9 @@ const handleSelectBbox = (e) => {
         // Cannot select a bbox again
         if (currentSelectedField !== undefined && currentSelectedField !== null && e.target.tagName === "DIV") {
             if (currentSelectedField.value === "") {
-                currentSelectedField.value = e.target.getAttribute("title").trim();
+                currentSelectedField.value = e.target.getAttribute("data-bs-title").trim();
             } else {
-                currentSelectedField.value = (currentSelectedField.value + ", " + e.target.getAttribute("title")).trim();
+                currentSelectedField.value = (currentSelectedField.value + ", " + e.target.getAttribute("data-bs-title")).trim();
             }
 
             const currBBoxes = JSON.parse(currentSelectedField.getAttribute("bboxes"));
@@ -132,6 +132,7 @@ const handleDeselectBbox = (e) => {
                     e.target.style.backgroundColor = "";
                 }
             }
+            currentSelectedField.dispatchEvent(new Event('focus'));
         }
     } catch (ex) {
         console.log("Error while deselecting: ", ex);
@@ -198,6 +199,7 @@ const handleDragEnd = (e) => {
         let maxY = null;
 
         const word_ids = []
+        let paragraph_content = "";
 
         validBboxes.forEach(function (element) {
             try {
@@ -206,6 +208,7 @@ const handleDragEnd = (e) => {
                     if (word_id === "" || isNaN(word_id)) {
                         return;
                     }
+                    paragraph_content += element.getAttribute("data-bs-title") + " ";
                     word_ids.push(word_id);
                     minX = Math.min(minX || parseFloat(element.style.left), parseFloat(element.style.left));
                     minY = Math.min(minY || parseFloat(element.style.top), parseFloat(element.style.top));
@@ -220,7 +223,7 @@ const handleDragEnd = (e) => {
         const paragraph_bbox = [minX * ratioX, minY * ratioY, maxX * ratioX, maxY * ratioY];
 
         annotateImgBboxes(document.getElementById("img"),
-            [[`${maxBboxId}`, paragraph_bbox]],
+            [[paragraph_content.trim(), paragraph_bbox]],
             false,
             'rgba(255, 255, 255, 0)');
 
@@ -267,7 +270,7 @@ const handleSelectField = (e) => {
         }
     });
 
-    console.log('currentSelectedElement: ', currentSelectedField);
+    // console.log('currentSelectedElement: ', currentSelectedField);
 
     currentSelectedField.getAttribute("relatedbboxes")
         .split("|")
@@ -355,7 +358,7 @@ async function annotateImgWordBboxes(imgToBeAnnotated, annotations, activate, ac
             const word_bbox = document.createElement("div");
             word_bbox.id = `word_bbox_${idx + 1}`;
 
-            word_bbox.setAttribute("title", `${annotations[idx][0]}`);
+            word_bbox.setAttribute("data-bs-title", `${annotations[idx][0]}`);
             word_bbox.setAttribute("word_bbox", `${JSON.stringify(annotations[idx][1])}`);
 
             if (activate) {
@@ -403,7 +406,11 @@ async function annotateImgBboxes(imgToBeAnnotated, annotations, activate, activa
 
             bbox.insertAdjacentHTML('beforeend', pill);
             bbox.id = `bbox_${maxBboxId + 1}`;
-            bbox.setAttribute("title", `${maxBboxId}`);
+            bbox.setAttribute("data-bs-title", `${maxBboxId}`);
+            bbox.setAttribute("data-bs-toggle", "popover");
+            bbox.setAttribute("data-bs-placement", "top");
+            bbox.setAttribute("data-bs-content", `${annotations[idx][0]}`);
+            bbox.setAttribute("data-bs-trigger", "hover");
             maxBboxId += 1;
 
             bbox.setAttribute("bbox", `${JSON.stringify(annotations[idx][1])}`);
