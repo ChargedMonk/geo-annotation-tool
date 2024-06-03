@@ -10,7 +10,7 @@ const resetAnnotationData = () => {
 
 const addNewParagraph = (paragraph_word_ids, paragraph_bbox) => {
     try {
-        const paragraph = new ParagraphObject("", paragraph_word_ids, paragraph_bbox, [], "", false, "ADDED");
+        const paragraph = new ParagraphObject(paragraphs.length, "", paragraph_word_ids, paragraph_bbox, [], "", false, "ADDED");
         paragraphs.push(paragraph);
     } catch (ex) {
         console.log("Error while adding new paragraph: ", ex);
@@ -33,16 +33,17 @@ const deleteParagraph = (e) => {
             deleteBtn = e.target.parentElement;
         }
 
-        if (currentParagraph.title === undefined || currentParagraph.title === null || isNaN(currentParagraph.title)) {
+        if (currentParagraph.getAttribute('data-bs-title') === undefined || currentParagraph.getAttribute('data-bs-title') === null || isNaN(currentParagraph.getAttribute('data-bs-title'))) {
             console.log("Failed to delete paragraph: Invalid paragraph index - ", currentParagraph);
             alert("Failed to delete paragraph: Invalid paragraph index");
         }
-        const currentParagraphIndex = currentParagraph.title;
-        console.log("Deleting paragraph: ", currentParagraphIndex);
+
+        const currentParagraphIndex = currentParagraph.getAttribute('data-bs-title');
+
         const keyValueFields = document.getElementsByClassName("key_value");
         for (let keyValueField of keyValueFields) {
-            const key = keyValueField.children[2].firstElementChild;
-            const value = keyValueField.children[3].firstElementChild;
+            const key = keyValueField.children[3].firstElementChild;
+            const value = keyValueField.children[4].firstElementChild;
 
             key.value = key.value.split(", ").filter(ele => ele !== currentParagraphIndex).join(", ");
             value.value = value.value.split(", ").filter(ele => ele !== currentParagraphIndex).join(", ");
@@ -54,12 +55,16 @@ const deleteParagraph = (e) => {
             }
         });
 
+        Array.from(document.getElementsByClassName("popover")).forEach(function (element) {
+            element.remove();
+        });
+
 
         currentParagraph.remove();
         deleteBtn.remove();
     } catch (ex) {
         console.log("Error while deleting paragraph: ", ex);
-        console.log("currentParagraphIndex: ", currentParagraphIndex);
+        console.log("e: ", e);
         console.log("paragraphs:\n", paragraphs);
         alert("Error while deleting paragraph:\n" + ex);
     }
@@ -71,8 +76,9 @@ const updateParagraphData = () => {
 
     for (let keyValueField of keyValueFields) {
         const standardKey = keyValueField.children[1].firstElementChild;
-        const key = keyValueField.children[2].firstElementChild;
-        const value = keyValueField.children[3].firstElementChild;
+        const lineItemNo = keyValueField.children[2].firstElementChild;
+        const key = keyValueField.children[3].firstElementChild;
+        const value = keyValueField.children[4].firstElementChild;
 
         if (standardKey.classList.contains("invalid-input") && key.value !== undefined && key.value !== null && key.value !== "") {
             throw new Error(`Please select a valid standard key for the field: "${key.value}"`);
@@ -84,11 +90,16 @@ const updateParagraphData = () => {
                 .forEach(function (key_element) {
                     try {
                         paragraphs[parseInt(key_element)].standardKey = standardKey.value;
+                        paragraphs[parseInt(key_element)].line_num = lineItemNo.value || "";
                         value.value?.split(", ")
-                            .filter(ele => (ele !== null && !isNaN(ele) && !ele.includes(".") && !ele.includes("-") && ele.replaceAll(" ", "") !== ""))
+                            .filter(ele => (!isNaN(ele) && !ele.includes(".") && !ele.includes("-")))
                             .forEach(function (value_element) {
                                 try {
-                                    paragraphs[parseInt(key_element)].linking.push(parseInt(value_element));
+                                    if (value_element === null || value_element === undefined || value_element.replaceAll(" ", "") === "") {
+                                        paragraphs[parseInt(key_element)].linking = [];
+                                    } else {
+                                        paragraphs[parseInt(key_element)].linking.push(parseInt(value_element));
+                                    }
                                 } catch (ex) {
                                     console.log("Error while updating linking data: ", ex);
                                     console.log("key_element: ", key_element);
@@ -151,8 +162,9 @@ const loadKeyValueData = (keyValueData) => {
                     !("status" in keyValueData[idx])
                 )) {
                 const standard_key = keyValues[keyValueFieldCounter].children[1].firstElementChild;
-                const key = keyValues[keyValueFieldCounter].children[2].firstElementChild;
-                const value = keyValues[keyValueFieldCounter].children[3].firstElementChild;
+                const lineItemNo = keyValues[keyValueFieldCounter].children[2].firstElementChild;
+                const key = keyValues[keyValueFieldCounter].children[3].firstElementChild;
+                const value = keyValues[keyValueFieldCounter].children[4].firstElementChild;
 
                 if ("standardKey" in keyValueData[idx] &&
                     keyValueData[idx].standardKey !== null
@@ -166,6 +178,10 @@ const loadKeyValueData = (keyValueData) => {
                     standard_key.value = "";
                     standard_key.classList.remove("valid-input");
                     standard_key.classList.add("invalid-input");
+                }
+
+                if ("line_num" in keyValueData[idx] && keyValueData[idx].line_num !== null && keyValueData[idx].line_num !== undefined) {
+                    lineItemNo.value = keyValueData[idx].line_num;
                 }
 
                 try {
@@ -237,7 +253,6 @@ const handleSaveBtn = (e) => {
 
 const handleAnnotationsUpload = (e) => {
     try {
-        existingBboxes = document.getElementsByClassName("bbox");
 
         spinner.classList.remove("hide");
 
@@ -266,9 +281,6 @@ const handleAnnotationsUpload = (e) => {
         fileReader.onload = function (f) {
             const content = JSON.parse(f.target.result);
             console.log(content);
-            // This is because of a bug related to incorrect annotation for the first text
-            // annotateField(null, "", ["[0,0,0,0]"]);
-            // annotateField(null, "", ["[0,0,0,0]"]);
             if ("word_list" in content &&
                 content.word_list !== null &&
                 content.word_list !== undefined &&
@@ -303,7 +315,11 @@ const handleAnnotationsUpload = (e) => {
                             paragraphs = content.updated_paragraphs;
                             for (let i = 0; i < content.updated_paragraphs.length; i++) {
                                 const bbox = content.updated_paragraphs[i].bbox;
-                                paragraphData.push([`${i}`, bbox]);
+                                let paragraph_content = "";
+                                content.updated_paragraphs[i].word_ids.forEach((word_id) => {
+                                    paragraph_content += `${content.word_list[word_id]} `;
+                                });
+                                paragraphData.push([paragraph_content.trim(), bbox]);
                                 if ('status' in content.updated_paragraphs[i] &&
                                     content.updated_paragraphs[i].status === "DELETED") {
                                     paragraphsToDelete.push(`delete_bbox_${i + 1}`);
@@ -314,7 +330,11 @@ const handleAnnotationsUpload = (e) => {
                             paragraphs = content.paragraphs;
                             for (let i = 0; i < content.paragraphs.length; i++) {
                                 const bbox = content.paragraphs[i].bbox;
-                                paragraphData.push([`${i}`, bbox]);
+                                let paragraph_content = "";
+                                content.paragraphs[i].word_ids.forEach((word_id) => {
+                                    paragraph_content += `${content.word_list[word_id]} `;
+                                });
+                                paragraphData.push([paragraph_content.trim(), bbox]);
                                 if ('status' in content.paragraphs[i] &&
                                     content.paragraphs[i].status === "DELETED") {
                                     paragraphsToDelete.push(`delete_bbox_${i + 1}`);
@@ -328,10 +348,15 @@ const handleAnnotationsUpload = (e) => {
                         annotateImgBboxes(document.getElementById("img"),
                             paragraphData,
                             false,
-                            'rgba(255, 255, 255, 0)').then(() => {
+                            'rgba(255, 255, 255, 0)')
+                            .then(() => {
+                                console.log("paragraphs to delete: ", paragraphsToDelete);
                                 for (let paragraphToDelete of paragraphsToDelete) {
                                     document.getElementById(paragraphToDelete).dispatchEvent(new Event('click'));
                                 }
+                            }).then(() => {
+                                const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+                                const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
                             }).then(() => {
                                 console.log("Image annotated with ocr data");
                                 if (paragraphs && paragraphs.length > 0) {
@@ -365,7 +390,8 @@ const handleAnnotationsUpload = (e) => {
 
 
 class ParagraphObject {
-    constructor(standardKey, word_ids, bbox, linking, line_num, isHeader, status) {
+    constructor(idx, standardKey, word_ids, bbox, linking, line_num, isHeader, status) {
+        this.idx = idx;
         this.standardKey = standardKey;
         this.word_ids = word_ids;
         this.bbox = bbox;
@@ -376,9 +402,11 @@ class ParagraphObject {
     }
 }
 
+const annotations_upload = document.getElementById("annotations_upload");
 const spinner = document.getElementById("spinner");
 const save_btn = document.getElementById("save_btn");
 
+annotations_upload.onchange = handleAnnotationsUpload;
 save_btn.onclick = handleSaveBtn;
 
 let anno_filename = null;
@@ -386,6 +414,5 @@ let word_list = null;
 let word_boxes_list = null;
 let original_paragraphs = null;
 let paragraphs = null;
-let existingBboxes = null;
 
 export { handleAnnotationsUpload, resetAnnotationData, addNewParagraph, deleteParagraph };
