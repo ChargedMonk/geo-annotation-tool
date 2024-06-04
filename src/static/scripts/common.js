@@ -1,4 +1,4 @@
-import { handleAnnotationsUpload, resetAnnotationData, addNewParagraph, deleteParagraph } from './load_annotations.js';
+import { handleAnnotationsUpload, resetAnnotationData, addNewParagraph, deleteParagraph, deselectParagraph } from './load_annotations.js';
 
 function getRandomColor() {
     const randomBetween = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
@@ -10,23 +10,29 @@ function getRandomColor() {
     return `rgba(${r}, ${g}, ${b}, ${a})`;
 };
 
+function updateDrawArrows(flag) {
+    drawArrows = flag;
+}
+
 function drawLine(elem1, elem2) {
-    new LeaderLine(
-        elem1,
-        elem2,
-        {
-            size: 2,
-            path: 'straight',
-            color: '#A0153E',
-            startPlug: 'square',
-            outlineColor: '#3F72AF',
-            startPlugOutline: true,
-            outline: true,
-            endPlugOutline: true,
-            outlineSize: 0.08,
-            endPlugSize: 3,
-        }
-    );
+    if (drawArrows) {
+        new LeaderLine(
+            elem1,
+            elem2,
+            {
+                size: 1,
+                path: 'straight',
+                color: '#A0153E',
+                startPlug: 'square',
+                outlineColor: '#3F72AF',
+                startPlugOutline: true,
+                outline: true,
+                endPlugOutline: true,
+                outlineSize: 0.08,
+                endPlugSize: 2,
+            }
+        );
+    }
 };
 
 const handleBboxHover = (e) => {
@@ -124,6 +130,8 @@ const handleDeselectBbox = (e) => {
 
                 e.target.classList.remove("selectedbbox");
                 e.target.classList.add("activebbox");
+
+                deselectParagraph(currentSelectedField.value.split(", "), e.target.getAttribute("data-bs-title"));
 
                 if ("style" in currentSelectedField && "backgroundColor" in currentSelectedField.style && !(currentSelectedField.style.backgroundColor === "")) {
                     if (currentSelectedField.value === undefined || currentSelectedField.value === null || currentSelectedField.value === "") {
@@ -229,8 +237,6 @@ const handleDragEnd = (e) => {
                 'rgba(255, 255, 255, 0)');
 
             addNewParagraph(word_ids, paragraph_bbox);
-            console.log("new para: ", document.getElementById(`bbox_${maxBboxId}`));
-
         }
 
         isDragging = false;
@@ -544,6 +550,7 @@ let dragCursorStartY = 0;
 let isDragging = false;
 let standardKeyOptions = [];
 let maxBboxId = 0;
+let drawArrows = false;
 
 img_upload.onchange = handleImgUpload;
 
@@ -561,4 +568,4 @@ Array.from(fields_to_be_annotated).forEach(function (element) {
 
 
 
-export { annotateImgBboxes, annotateImgWordBboxes, clearImageBBoxes, handleChangeInStandardKey, handleSelectField, standardKeyOptions };
+export { annotateImgBboxes, annotateImgWordBboxes, clearImageBBoxes, handleChangeInStandardKey, handleSelectField, standardKeyOptions, updateDrawArrows };
