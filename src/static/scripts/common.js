@@ -229,6 +229,8 @@ const handleDragEnd = (e) => {
                 'rgba(255, 255, 255, 0)');
 
             addNewParagraph(word_ids, paragraph_bbox);
+            console.log("new para: ", document.getElementById(`bbox_${maxBboxId}`));
+
         }
 
         isDragging = false;
@@ -435,6 +437,8 @@ async function annotateImgBboxes(imgToBeAnnotated, annotations, activate, activa
             bbox.addEventListener('mouseout', handleBboxNotHover);
 
             img_container.appendChild(bbox);
+
+            new bootstrap.Popover(bbox);
 
             document.getElementById("delete_bbox_" + maxBboxId)?.addEventListener('click', deleteParagraph);
         }
