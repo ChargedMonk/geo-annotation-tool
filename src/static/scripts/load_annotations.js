@@ -359,9 +359,6 @@ const handleAnnotationsUpload = (e) => {
                                     document.getElementById(paragraphToDelete).dispatchEvent(new Event('click'));
                                 }
                             }).then(() => {
-                                const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-                                const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
-                            }).then(() => {
                                 console.log("Image annotated with ocr data");
                                 if (paragraphs && paragraphs.length > 0) {
                                     loadKeyValueData(paragraphs);
