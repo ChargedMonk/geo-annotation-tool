@@ -220,14 +220,16 @@ const handleDragEnd = (e) => {
             }
         });
 
-        const paragraph_bbox = [minX * ratioX, minY * ratioY, maxX * ratioX, maxY * ratioY];
+        if (validBboxes.length > 0) {
+            const paragraph_bbox = [minX * ratioX, minY * ratioY, maxX * ratioX, maxY * ratioY];
 
-        annotateImgBboxes(document.getElementById("img"),
-            [[paragraph_content.trim(), paragraph_bbox]],
-            false,
-            'rgba(255, 255, 255, 0)');
+            annotateImgBboxes(document.getElementById("img"),
+                [[paragraph_content.trim(), paragraph_bbox]],
+                false,
+                'rgba(255, 255, 255, 0)');
 
-        addNewParagraph(word_ids, paragraph_bbox);
+            addNewParagraph(word_ids, paragraph_bbox);
+        }
 
         isDragging = false;
         dragCursorStartX = 0;

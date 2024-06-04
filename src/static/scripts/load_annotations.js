@@ -10,7 +10,7 @@ const resetAnnotationData = () => {
 
 const addNewParagraph = (paragraph_word_ids, paragraph_bbox) => {
     try {
-        const paragraph = new ParagraphObject(paragraphs.length, "", paragraph_word_ids, paragraph_bbox, [], "", false, "ADDED");
+        const paragraph = new ParagraphObject(paragraphs.length, "MISC", paragraph_word_ids, paragraph_bbox, [], "", false, "ADDED");
         paragraphs.push(paragraph);
     } catch (ex) {
         console.log("Error while adding new paragraph: ", ex);
@@ -89,7 +89,11 @@ const updateParagraphData = () => {
                 .filter(ele => (ele !== null && !isNaN(ele) && !ele.includes(".") && !ele.includes("-") && ele.replaceAll(" ", "") !== ""))
                 .forEach(function (key_element) {
                     try {
-                        paragraphs[parseInt(key_element)].standardKey = standardKey.value;
+                        if (standardKey.value === null || standardKey.value === undefined || standardKey.value.replaceAll(" ", "") === "") {
+                            paragraphs[parseInt(key_element)].standardKey = "MISC";
+                        } else {
+                            paragraphs[parseInt(key_element)].standardKey = standardKey.value;
+                        }
                         paragraphs[parseInt(key_element)].line_num = lineItemNo.value || "";
                         value.value?.split(", ")
                             .filter(ele => (!isNaN(ele) && !ele.includes(".") && !ele.includes("-")))
