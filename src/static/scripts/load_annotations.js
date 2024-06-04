@@ -1,4 +1,4 @@
-import { annotateImgBboxes, annotateImgWordBboxes, clearImageBBoxes, standardKeyOptions } from "./common.js";
+import { annotateImgBboxes, annotateImgWordBboxes, clearImageBBoxes, standardKeyOptions, updateDrawArrows } from "./common.js";
 import { handleAddKeyValue, handleDeleteKeyValue } from "./link_annotation.js";
 
 const resetAnnotationData = () => {
@@ -20,6 +20,22 @@ const addNewParagraph = (paragraph_word_ids, paragraph_bbox) => {
         alert("Error while adding new paragraph:\n" + ex);
     }
 };
+
+const deselectParagraph = (paragraph_idx_list, paragraph_to_deselect_idx) => {
+    try {
+        for (let paragraph_idx of paragraph_idx_list) {
+            if (paragraphs[parseInt(paragraph_idx)].linking.includes(parseInt(paragraph_to_deselect_idx))) {
+                paragraphs[parseInt(paragraph_idx)].linking = paragraphs[parseInt(paragraph_idx)].linking.filter(ele => ele !== parseInt(paragraph_to_deselect_idx));
+            }
+        }
+    } catch (ex) {
+        console.log("Error while deselecting paragraph: ", ex);
+        console.log("paragraph_idx: ", paragraph_idx);
+        console.log("paragraph_to_deselect_idx: ", paragraph_to_deselect_idx);
+        console.log("paragraphs:\n", paragraphs);
+        alert("Error while deselecting paragraph:\n" + ex);
+    }
+}
 
 const deleteParagraph = (e) => {
     try {
@@ -102,7 +118,9 @@ const updateParagraphData = () => {
                                     if (value_element === null || value_element === undefined || value_element.replaceAll(" ", "") === "") {
                                         paragraphs[parseInt(key_element)].linking = [];
                                     } else {
-                                        paragraphs[parseInt(key_element)].linking.push(parseInt(value_element));
+                                        if (!paragraphs[parseInt(key_element)].linking.includes(parseInt(value_element))) {
+                                            paragraphs[parseInt(key_element)].linking.push(parseInt(value_element));
+                                        }
                                     }
                                 } catch (ex) {
                                     console.log("Error while updating linking data: ", ex);
@@ -315,7 +333,7 @@ const handleAnnotationsUpload = (e) => {
                     'rgba(255, 255, 255, 0)')
                     .then(() => {
                         if ("updated_paragraphs" in content && content.updated_paragraphs !== null && content.updated_paragraphs !== undefined && content.updated_paragraphs.length > 0) {
-                            original_paragraphs = content.updated_paragraphs;
+                            original_paragraphs = content.paragraphs || content.updated_paragraphs;
                             paragraphs = content.updated_paragraphs;
                             for (let i = 0; i < content.updated_paragraphs.length; i++) {
                                 const bbox = content.updated_paragraphs[i].bbox;
@@ -361,8 +379,11 @@ const handleAnnotationsUpload = (e) => {
                             }).then(() => {
                                 console.log("Image annotated with ocr data");
                                 if (paragraphs && paragraphs.length > 0) {
+                                    updateDrawArrows(false);
                                     loadKeyValueData(paragraphs);
+                                    updateDrawArrows(true);
                                 }
+                                spinner.classList.add("hide");
                             }).catch((e) => {
                                 console.log("Error while annotating image with ocr data: ", e);
                                 spinner.classList.add("hide");
@@ -373,7 +394,6 @@ const handleAnnotationsUpload = (e) => {
                         spinner.classList.add("hide");
                         alert("Error while annotating image with ocr data:\n" + e);
                     });
-                spinner.classList.add("hide");
             } else {
                 console.log("No ocr data found in annotations file");
                 spinner.classList.add("hide");
@@ -416,4 +436,4 @@ let word_boxes_list = null;
 let original_paragraphs = null;
 let paragraphs = null;
 
-export { handleAnnotationsUpload, resetAnnotationData, addNewParagraph, deleteParagraph };
+export { handleAnnotationsUpload, resetAnnotationData, addNewParagraph, deleteParagraph, deselectParagraph };
