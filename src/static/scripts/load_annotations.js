@@ -8,6 +8,19 @@ const resetAnnotationData = () => {
     paragraphs = null;
 };
 
+const unlinkParagraph = (paragraph_idx_list) => {
+    try {
+        for (let paragraph_idx of paragraph_idx_list) {
+            paragraphs[parseInt(paragraph_idx)].linking = [];
+        }
+    } catch (ex) {
+        console.log("Error while unlinking paragraph: ", ex);
+        console.log("paragraph_idx_list: ", paragraph_idx_list);
+        console.log("paragraphs:\n", paragraphs);
+        alert("Error while unlinking paragraph:\n" + ex);
+    }
+};
+
 const addNewParagraph = (paragraph_word_ids, paragraph_bbox) => {
     try {
         const paragraph = new ParagraphObject(paragraphs.length, "MISC", paragraph_word_ids, paragraph_bbox, [], "", false, "ADDED");
@@ -446,4 +459,4 @@ let word_boxes_list = null;
 let original_paragraphs = null;
 let paragraphs = null;
 
-export { handleAnnotationsUpload, resetAnnotationData, addNewParagraph, deleteParagraph, deselectParagraph };
+export { handleAnnotationsUpload, resetAnnotationData, addNewParagraph, deleteParagraph, deselectParagraph, unlinkParagraph };
