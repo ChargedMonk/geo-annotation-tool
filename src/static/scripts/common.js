@@ -126,7 +126,9 @@ const handleDeselectBbox = (e) => {
                 e.target.classList.remove("selectedbbox");
                 e.target.classList.add("activebbox");
 
-                deselectParagraph(currentSelectedField.value.split(", "), e.target.getAttribute("data-bs-title"));
+                if (currentSelectedField.classList.contains("value")) {
+                    deselectParagraph(currentSelectedField.parentElement.previousElementSibling.firstElementChild.value.split(", "), e.target.getAttribute("data-bs-title"));
+                }
 
                 if ("style" in currentSelectedField && "backgroundColor" in currentSelectedField.style && !(currentSelectedField.style.backgroundColor === "")) {
                     if (currentSelectedField.value === undefined || currentSelectedField.value === null || currentSelectedField.value === "") {
@@ -275,7 +277,7 @@ const handleSelectField = (e) => {
         .split(", ")
         .filter(ele => ele !== '')
         .forEach(function (element) {
-            const bbox = document.getElementById("bbox_" + element);
+            const bbox = document.getElementById("bbox_" + (parseInt(element) + 1));
             if (bbox === null || bbox === undefined) {
                 return;
             }
@@ -288,7 +290,7 @@ const handleSelectField = (e) => {
                             .split(", ")
                             .filter(ele => ele !== '')
                             .forEach(function (element) {
-                                const value_element = document.getElementById("bbox_" + element);
+                                const value_element = document.getElementById("bbox_" + (parseInt(element) + 1));
                                 if (value_element === null || value_element === undefined) {
                                     return;
                                 }
@@ -308,7 +310,7 @@ const handleSelectField = (e) => {
                             .split(", ")
                             .filter(ele => ele !== '')
                             .forEach(function (element) {
-                                drawLine(document.getElementById("bbox_" + element), bbox);
+                                drawLine(document.getElementById("bbox_" + (parseInt(element) + 1)), bbox);
                             });
                     }
                 }
@@ -320,7 +322,7 @@ const handleSelectField = (e) => {
 
 
 const handleChangeInStandardKey = (e) => {
-    if (e.target.value === undefined || e.target.value === null || e.target.value === "" || !standardKeyOptions.includes(e.target.value)) {
+    if (e.target.value === undefined || e.target.value === null || (!standardKeyOptions.includes(e.target.value) && e.target.value !== "")) {
         e.target.classList.remove('valid-input');
         e.target.classList.add('invalid-input');
     } else {

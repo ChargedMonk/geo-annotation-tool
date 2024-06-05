@@ -20,8 +20,8 @@ const handleAddKeyValue = (e) => {
                                 <button type="button" class="btn delete_key_value_btn"><i class="bi bi-trash"></i></button>
                             </div>
                             <div class="col-1 flex-grow-1">
-                                <input class="form-control standard-key-dropdown invalid-input" list="standardKeyOptionsList"
-                                    placeholder="Standard Key" aria-label="Standard Key">
+                                <input class="form-control standard-key-dropdown valid-input" list="standardKeyOptionsList"
+                                    placeholder="MISC" aria-label="Standard Key">
                             </div>
                             <div class="col-1 d-flex justify-content-center flex-grow-1">
                                 <input type="checkbox" class="btn-check" id="btn-check-outlined_${uuid}" autocomplete="off">
