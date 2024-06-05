@@ -212,12 +212,13 @@ const handleDragEnd = (e) => {
         validBboxes.forEach(function (element) {
             try {
                 if (element !== undefined && element !== null) {
-                    const word_id = parseInt(element.id.replace(/\D/g, ''));
+                    const word_id = element.id.replace(/\D/g, '');
                     if (word_id === "" || isNaN(word_id)) {
                         return;
                     }
                     paragraph_content += element.getAttribute("data-bs-title") + " ";
-                    word_ids.push(word_id);
+                    console.log("word_id: ", word_id, "word: ", element.getAttribute("data-bs-title"));
+                    word_ids.push(parseInt(word_id) - 1);
                     minX = Math.min(minX || parseFloat(element.style.left), parseFloat(element.style.left));
                     minY = Math.min(minY || parseFloat(element.style.top), parseFloat(element.style.top));
                     maxX = Math.max(maxX || parseFloat(element.style.width), parseFloat(element.style.left) + parseFloat(element.style.width));
