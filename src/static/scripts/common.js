@@ -79,9 +79,6 @@ const handleSelectBbox = (e) => {
             currBBoxes.push(e.target.getAttribute("bbox"));
             currentSelectedField.setAttribute("bboxes", JSON.stringify(currBBoxes));
 
-            currentSelectedField.setAttribute("relatedbboxes",
-                currentSelectedField.getAttribute("relatedbboxes") + "|" + e.target.id + "|");
-
             e.target.classList.remove("inactivebbox");
             e.target.classList.remove("activebbox");
             e.target.classList.add("selectedbbox");
@@ -125,8 +122,6 @@ const handleDeselectBbox = (e) => {
                 currentSelectedFieldValueList.splice(currBboxIdx, 1);
                 currentSelectedField.value = currentSelectedFieldValueList.join(", ");
                 currentSelectedField.setAttribute("bboxes", JSON.stringify(currBboxes));
-
-                currentSelectedField.setAttribute("relatedbboxes", currentSelectedField.getAttribute("relatedbboxes").replaceAll("|" + e.target.id + "|", ""));
 
                 e.target.classList.remove("selectedbbox");
                 e.target.classList.add("activebbox");
@@ -263,13 +258,6 @@ const handleSelectField = (e) => {
         || currentSelectedField.getAttribute("bboxes") === undefined) {
         currentSelectedField.setAttribute("bboxes", JSON.stringify([]));
     }
-    if ((!currentSelectedField.hasAttribute("relatedbboxes"))
-        || currentSelectedField.getAttribute("relatedbboxes") === "null"
-        || currentSelectedField.getAttribute("relatedbboxes") === ""
-        || currentSelectedField.getAttribute("relatedbboxes") === null
-        || currentSelectedField.getAttribute("relatedbboxes") === undefined) {
-        currentSelectedField.setAttribute("relatedbboxes", "");
-    }
 
     Array.from(document.getElementsByClassName("bbox")).forEach(function (element) {
         element.classList.remove("highlightbbox");
@@ -283,11 +271,11 @@ const handleSelectField = (e) => {
 
     // console.log('currentSelectedElement: ', currentSelectedField);
 
-    currentSelectedField.getAttribute("relatedbboxes")
-        .split("|")
+    currentSelectedField.value
+        .split(", ")
         .filter(ele => ele !== '')
         .forEach(function (element) {
-            const bbox = document.getElementById(element);
+            const bbox = document.getElementById("bbox_" + element);
             if (bbox === null || bbox === undefined) {
                 return;
             }
@@ -295,12 +283,12 @@ const handleSelectField = (e) => {
             try {
                 if (currentSelectedField.classList.contains("key")) {
                     const value_field = currentSelectedField.parentElement.nextElementSibling.firstElementChild;
-                    if (value_field.hasAttribute("relatedbboxes") && value_field.getAttribute("relatedbboxes") !== undefined && value_field.getAttribute("relatedbboxes") !== null && value_field.getAttribute("relatedbboxes") !== "") {
-                        value_field.getAttribute("relatedbboxes")
-                            .split("|")
+                    if (value_field !== undefined && value_field !== null && value_field.value !== undefined && value_field.value !== null && value_field.value !== "") {
+                        value_field.value
+                            .split(", ")
                             .filter(ele => ele !== '')
                             .forEach(function (element) {
-                                const value_element = document.getElementById(element);
+                                const value_element = document.getElementById("bbox_" + element);
                                 if (value_element === null || value_element === undefined) {
                                     return;
                                 }
@@ -315,12 +303,12 @@ const handleSelectField = (e) => {
                     }
                 } else {
                     const key_field = currentSelectedField.parentElement.previousElementSibling.firstElementChild;
-                    if (key_field.hasAttribute("relatedbboxes") && key_field.getAttribute("relatedbboxes") !== undefined && key_field.getAttribute("relatedbboxes") !== null && key_field.getAttribute("relatedbboxes") !== "") {
-                        key_field.getAttribute("relatedbboxes")
-                            .split("|")
+                    if (key_field !== undefined && key_field !== null && key_field.value !== undefined && key_field.value !== null && key_field.value !== "") {
+                        key_field.value
+                            .split(", ")
                             .filter(ele => ele !== '')
                             .forEach(function (element) {
-                                drawLine(document.getElementById(element), bbox);
+                                drawLine(document.getElementById("bbox_" + element), bbox);
                             });
                     }
                 }
