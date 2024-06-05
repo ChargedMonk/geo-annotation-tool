@@ -1,4 +1,5 @@
 import { handleChangeInStandardKey, handleSelectField } from "./common.js";
+import { unlinkParagraph } from "./load_annotations.js";
 
 const handleDeleteKeyValue = (e) => {
     let currentKeyValueRow = null;
@@ -9,6 +10,7 @@ const handleDeleteKeyValue = (e) => {
     }
 
     if (currentKeyValueRow.parentElement.childElementCount > 1) {
+        unlinkParagraph(currentKeyValueRow.children[4].firstElementChild.value.split(", "));
         currentKeyValueRow.remove();
     }
 };

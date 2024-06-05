@@ -1,4 +1,4 @@
-import { handleAnnotationsUpload, resetAnnotationData, addNewParagraph, deleteParagraph, deselectParagraph } from './load_annotations.js';
+import { handleAnnotationsUpload, resetAnnotationData, addNewParagraph, deleteParagraph, deselectParagraph, unlinkParagraph } from './load_annotations.js';
 
 function getRandomColor() {
     const randomBetween = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
