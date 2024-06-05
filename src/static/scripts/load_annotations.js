@@ -92,9 +92,10 @@ const updateParagraphData = () => {
 
     for (let keyValueField of keyValueFields) {
         const standardKey = keyValueField.children[1].firstElementChild;
-        const lineItemNo = keyValueField.children[2].firstElementChild;
-        const key = keyValueField.children[3].firstElementChild;
-        const value = keyValueField.children[4].firstElementChild;
+        const isHeader = keyValueField.children[2].firstElementChild;
+        const lineItemNo = keyValueField.children[3].firstElementChild;
+        const key = keyValueField.children[4].firstElementChild;
+        const value = keyValueField.children[5].firstElementChild;
 
         if (standardKey.classList.contains("invalid-input") && key.value !== undefined && key.value !== null && key.value !== "") {
             throw new Error(`Please select a valid standard key for the field: "${key.value}"`);
@@ -111,6 +112,8 @@ const updateParagraphData = () => {
                             paragraphs[parseInt(key_element)].standardKey = standardKey.value;
                         }
                         paragraphs[parseInt(key_element)].line_num = lineItemNo.value || "";
+                        paragraphs[parseInt(key_element)].isHeader = isHeader.checked || false;
+
                         value.value?.split(", ")
                             .filter(ele => (!isNaN(ele) && !ele.includes(".") && !ele.includes("-")))
                             .forEach(function (value_element) {
@@ -184,9 +187,10 @@ const loadKeyValueData = (keyValueData) => {
                     !("status" in keyValueData[idx])
                 )) {
                 const standard_key = keyValues[keyValueFieldCounter].children[1].firstElementChild;
-                const lineItemNo = keyValues[keyValueFieldCounter].children[2].firstElementChild;
-                const key = keyValues[keyValueFieldCounter].children[3].firstElementChild;
-                const value = keyValues[keyValueFieldCounter].children[4].firstElementChild;
+                const isHeader = keyValues[keyValueFieldCounter].children[2].firstElementChild;
+                const lineItemNo = keyValues[keyValueFieldCounter].children[3].firstElementChild;
+                const key = keyValues[keyValueFieldCounter].children[4].firstElementChild;
+                const value = keyValues[keyValueFieldCounter].children[5].firstElementChild;
 
                 if ("standardKey" in keyValueData[idx] &&
                     keyValueData[idx].standardKey !== null
@@ -205,6 +209,9 @@ const loadKeyValueData = (keyValueData) => {
                 if ("line_num" in keyValueData[idx] && keyValueData[idx].line_num !== null && keyValueData[idx].line_num !== undefined) {
                     lineItemNo.value = keyValueData[idx].line_num;
                 }
+
+                console.log("isHeader.checked: ", keyValueData[idx].isHeader, "->", isHeader.checked);
+                isHeader.checked = keyValueData[idx].isHeader;
 
                 try {
                     key.dispatchEvent(new Event('focus'));
