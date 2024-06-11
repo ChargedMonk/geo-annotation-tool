@@ -12,6 +12,7 @@ const unlinkParagraph = (paragraph_idx_list) => {
     try {
         for (let paragraph_idx of paragraph_idx_list) {
             paragraphs[parseInt(paragraph_idx)].linking = [];
+            paragraphs[parseInt(paragraph_idx)].standardKey = "MISC";
         }
     } catch (ex) {
         console.log("Error while unlinking paragraph: ", ex);
