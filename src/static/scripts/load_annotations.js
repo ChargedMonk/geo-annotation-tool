@@ -175,8 +175,9 @@ const loadKeyValueData = (keyValueData) => {
     for (let idx = 0; idx < keyValueData.length; idx++) {
         if ('linking' in keyValueData[idx] &&
             keyValueData[idx].linking !== undefined &&
-            keyValueData[idx].linking !== null &&
-            keyValueData[idx].linking.length > 0) {
+            keyValueData[idx].linking !== null
+            // && keyValueData[idx].linking.length > 0
+        ) {
             validLinkingsLength += 1;
         }
     }
@@ -198,7 +199,7 @@ const loadKeyValueData = (keyValueData) => {
             if ("linking" in keyValueData[idx] &&
                 keyValueData[idx].linking !== null &&
                 keyValueData[idx].linking !== undefined &&
-                keyValueData[idx].linking.length > 0 &&
+                // keyValueData[idx].linking.length > 0 &&
                 (
                     ("status" in keyValueData[idx] && keyValueData[idx].status !== "DELETED") ||
                     !("status" in keyValueData[idx])
