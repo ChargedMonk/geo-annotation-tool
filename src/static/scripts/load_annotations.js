@@ -171,6 +171,7 @@ const loadKeyValueData = (keyValueData) => {
     const keyValues = document.getElementsByClassName("key_value");
     const currentKeyValueNum = keyValues.length;
     let validLinkingsLength = 0;
+    const keysNotToShow = new Set();
 
     for (let idx = 0; idx < keyValueData.length; idx++) {
         if ('linking' in keyValueData[idx] &&
@@ -179,8 +180,12 @@ const loadKeyValueData = (keyValueData) => {
             // && keyValueData[idx].linking.length > 0
         ) {
             validLinkingsLength += 1;
+            keyValueData[idx].linking.forEach((linking) => {
+                keysNotToShow.add(linking);
+            });
         }
     }
+    validLinkingsLength -= keysNotToShow.size;
 
     if (currentKeyValueNum < validLinkingsLength) {
         for (let idx = 0; idx < (validLinkingsLength - currentKeyValueNum); idx++) {
@@ -199,6 +204,7 @@ const loadKeyValueData = (keyValueData) => {
             if ("linking" in keyValueData[idx] &&
                 keyValueData[idx].linking !== null &&
                 keyValueData[idx].linking !== undefined &&
+                (!keysNotToShow.has(idx)) &&
                 // keyValueData[idx].linking.length > 0 &&
                 (
                     ("status" in keyValueData[idx] && keyValueData[idx].status !== "DELETED") ||
