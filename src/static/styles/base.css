@@ -2,7 +2,6 @@
     -webkit-box-shadow: inset 0 0 6px rgb(17, 45, 78, 0);
     border-radius: 0px;
     background-color: var(rgb(17, 45, 78));
-    ;
 }
 
 ::-webkit-scrollbar {
@@ -66,11 +65,10 @@ input[type=number]::-webkit-outer-spin-button {
     background-color: #F9F7F7;
 }
 
-#key_value_tab,
-#invoice_tab,
-#container_tab {
+#key_value_tab {
     height: 80vh;
-    overflow: auto;
+    overflow: hidden;
+    overflow-y: scroll;
 }
 
 #img {

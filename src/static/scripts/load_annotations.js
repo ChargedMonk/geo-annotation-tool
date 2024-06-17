@@ -8,6 +8,22 @@ const resetAnnotationData = () => {
     paragraphs = null;
 };
 
+const deleteAllRows = () => {
+    try {
+        const keyValues = document.getElementsByClassName("key_value");
+        while (keyValues.length > 1) {
+            handleDeleteKeyValue({ "target": keyValues[keyValues.length - 1].firstElementChild.firstElementChild });
+        }
+        handleAddKeyValue({ "target": keyValues[keyValues.length - 1].lastElementChild.firstElementChild });
+        handleDeleteKeyValue({ "target": keyValues[0].firstElementChild.firstElementChild });
+    } catch (ex) {
+        console.log("Error while deleting all rows: ", ex);
+        console.log("keyValues:\n", keyValues);
+        alert("Error while deleting all rows:\n" + ex);
+    }
+
+};
+
 const unlinkParagraph = (paragraph_idx_list) => {
     try {
         for (let paragraph_idx of paragraph_idx_list) {
@@ -457,9 +473,11 @@ class ParagraphObject {
 const annotations_upload = document.getElementById("annotations_upload");
 const spinner = document.getElementById("spinner");
 const save_btn = document.getElementById("save_btn");
+const delete_all_btn = document.getElementById("delete_all_btn");
 
 annotations_upload.onchange = handleAnnotationsUpload;
 save_btn.onclick = handleSaveBtn;
+delete_all_btn.onclick = deleteAllRows;
 
 let anno_filename = null;
 let word_list = null;
