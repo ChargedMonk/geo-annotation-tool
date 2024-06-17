@@ -10,7 +10,9 @@ const handleDeleteKeyValue = (e) => {
     }
 
     if (currentKeyValueRow.parentElement.childElementCount > 1) {
-        unlinkParagraph(currentKeyValueRow.children[4].firstElementChild.value.split(", "));
+        if (currentKeyValueRow.children[4].firstElementChild.value !== undefined && currentKeyValueRow.children[4].firstElementChild.value !== null && currentKeyValueRow.children[4].firstElementChild.value !== "") {
+            unlinkParagraph(currentKeyValueRow.children[4].firstElementChild.value.split(", "));
+        }
         currentKeyValueRow.remove();
     }
 };
