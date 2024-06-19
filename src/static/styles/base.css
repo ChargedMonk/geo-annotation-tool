@@ -209,15 +209,15 @@ i {
 }
 
 .highlightbbox {
-    transform: scale(1.15);
-    border: 0.13rem solid rgba(54, 17, 78, 0.7);
-    box-shadow: 0 0 0.8rem rgba(63, 114, 175, 1);
+    transform: scale(1.25);
+    border: 0.15rem ridge rgba(54, 17, 78, 1);
+    box-shadow: 0 0 0.5rem 0.6rem rgba(63, 114, 175, 0.7);
 }
 
 .highlightactivebbox {
     transform: scale(1.25);
-    border: 0.13rem solid rgba(54, 17, 78, 0.7);
-    box-shadow: 0 0 0.8rem rgb(63, 114, 175, 1);
+    border: 0.15rem ridge rgba(54, 17, 78, 1);
+    box-shadow: 0 0 0.5rem 0.6rem rgb(63, 114, 175, 0.7);
 
 }
 

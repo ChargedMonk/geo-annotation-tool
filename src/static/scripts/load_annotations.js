@@ -134,38 +134,67 @@ const updateParagraphData = () => {
             throw new Error(`Please select a valid standard key for the field: "${key.value}"`);
         }
         try {
-
+            if (key.value === null || key.value === undefined) {
+                key.value = "";
+            }
             key.value?.split(", ")
-                .filter(ele => (ele !== null && !isNaN(ele) && !ele.includes(".") && !ele.includes("-") && ele.replaceAll(" ", "") !== ""))
                 .forEach(function (key_element) {
                     try {
-                        if (standardKey.value === null || standardKey.value === undefined || standardKey.value.replaceAll(" ", "") === "") {
-                            paragraphs[parseInt(key_element)].standardKey = "MISC";
-                        } else {
-                            paragraphs[parseInt(key_element)].standardKey = standardKey.value;
-                        }
-                        paragraphs[parseInt(key_element)].line_num = lineItemNo.value || "";
-                        paragraphs[parseInt(key_element)].isHeader = isHeader.checked || false;
+                        if (key_element !== undefined &&
+                            key_element !== null &&
+                            !isNaN(key_element) &&
+                            key_element.replaceAll(" ", "") !== "" &&
+                            !key_element.includes(".") &&
+                            !key_element.includes("-")) {
+                            if (standardKey.value === null || standardKey.value === undefined || standardKey.value.replaceAll(" ", "") === "") {
+                                paragraphs[parseInt(key_element)].standardKey = "MISC";
+                            } else {
+                                paragraphs[parseInt(key_element)].standardKey = standardKey.value;
+                            }
 
-                        value.value?.split(", ")
-                            .filter(ele => (!isNaN(ele) && !ele.includes(".") && !ele.includes("-")))
-                            .forEach(function (value_element) {
-                                try {
-                                    if (value_element === null || value_element === undefined || value_element.replaceAll(" ", "") === "") {
-                                        paragraphs[parseInt(key_element)].linking = [];
-                                    } else {
-                                        if (!paragraphs[parseInt(key_element)].linking.includes(parseInt(value_element))) {
-                                            paragraphs[parseInt(key_element)].linking.push(parseInt(value_element));
+                            paragraphs[parseInt(key_element)].line_num = lineItemNo.value || "";
+                            paragraphs[parseInt(key_element)].isHeader = isHeader.checked || false;
+
+                            value.value?.split(", ")
+                                .filter(ele => (!isNaN(ele) && !ele.includes(".") && !ele.includes("-")))
+                                .forEach(function (value_element) {
+                                    try {
+                                        if (value_element === null || value_element === undefined || value_element.replaceAll(" ", "") === "") {
+                                            paragraphs[parseInt(key_element)].linking = [];
+                                        } else {
+                                            if (!paragraphs[parseInt(key_element)].linking.includes(parseInt(value_element))) {
+                                                paragraphs[parseInt(key_element)].linking.push(parseInt(value_element));
+                                            }
                                         }
+                                    } catch (ex) {
+                                        console.log("Error while updating linking data: ", ex);
+                                        console.log("key_element: ", key_element);
+                                        console.log("value_element: ", value_element);
+                                        console.log("paragraphs:\n", paragraphs);
+                                        alert("Error while updating linking data:\n" + ex);
                                     }
-                                } catch (ex) {
-                                    console.log("Error while updating linking data: ", ex);
-                                    console.log("key_element: ", key_element);
+                                });
+                        } else {
+                            value.value?.split(", ")
+                                .filter(ele => (!isNaN(ele) && !ele.includes(".") && !ele.includes("-")))
+                                .forEach(function (value_element) {
                                     console.log("value_element: ", value_element);
-                                    console.log("paragraphs:\n", paragraphs);
-                                    alert("Error while updating linking data:\n" + ex);
-                                }
-                            });
+                                    try {
+                                        if (!(value_element === null || value_element === undefined || value_element.replaceAll(" ", "") === "")) {
+                                            console.log("populating value");
+                                            paragraphs[parseInt(value_element)].standardKey = standardKey.value || "MISC";
+                                            paragraphs[parseInt(value_element)].line_num = lineItemNo.value || "";
+                                            paragraphs[parseInt(value_element)].isHeader = isHeader.checked || false;
+                                        }
+                                    } catch (ex) {
+                                        console.log("Error while updating linking data: ", ex);
+                                        console.log("key_element: ", key_element);
+                                        console.log("value_element: ", value_element);
+                                        console.log("paragraphs:\n", paragraphs);
+                                        alert("Error while updating linking data:\n" + ex);
+                                    }
+                                });
+                        }
                     } catch (ex) {
                         console.log("Error while updating linking data: ", ex);
                         console.log("key_element: ", key_element);
@@ -459,7 +488,7 @@ const handleAnnotationsUpload = (e) => {
 
 class ParagraphObject {
     constructor(idx, standardKey, word_ids, bbox, linking, line_num, isHeader, status) {
-        this.idx = idx;
+        this.index = idx;
         this.standardKey = standardKey;
         this.word_ids = word_ids;
         this.bbox = bbox;
