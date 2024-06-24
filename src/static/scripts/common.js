@@ -69,11 +69,18 @@ const handleSelectBbox = (e) => {
     try {
         // Cannot select a bbox again
         if (currentSelectedField !== undefined && currentSelectedField !== null && e.target.tagName === "DIV") {
+            console.log("idSet: ", idSet);
+            if (idSet.has(e.target.getAttribute("data-bs-title").trim())) {
+                console.log("Already selected: ", e.target.getAttribute("data-bs-title").trim());
+                alert("Already selected: " + e.target.getAttribute("data-bs-title").trim());
+                return;
+            }
             if (currentSelectedField.value === "") {
                 currentSelectedField.value = e.target.getAttribute("data-bs-title").trim();
             } else {
                 currentSelectedField.value = (currentSelectedField.value + ", " + e.target.getAttribute("data-bs-title")).trim();
             }
+            idSet.add(e.target.getAttribute("data-bs-title").trim());
 
             const currBBoxes = JSON.parse(currentSelectedField.getAttribute("bboxes"));
             currBBoxes.push(e.target.getAttribute("bbox"));
@@ -117,6 +124,8 @@ const handleDeselectBbox = (e) => {
             }
 
             if (currBboxIdx > -1) {
+                console.log("idSet: ", idSet);
+                idSet.delete(e.target.getAttribute("data-bs-title").trim());
                 currBboxes.splice(currBboxIdx, 1);
                 let currentSelectedFieldValueList = currentSelectedField.value.split(", ");
                 currentSelectedFieldValueList.splice(currBboxIdx, 1);
@@ -332,6 +341,71 @@ const handleChangeInStandardKey = (e) => {
 };
 
 
+const deleteIds = (idsToDelete) => {
+    try {
+        idsToDelete.forEach(function (element) {
+            idSet.delete(element);
+        });
+    } catch (ex) {
+        console.log("Error while deleting ids: ", ex);
+    }
+}
+
+
+const changeFocusOnArrowKey = (e) => {
+    try {
+        if (currentSelectedField !== undefined && currentSelectedField !== null) {
+            if (e.code === 'ArrowUp') {
+                // up arrow
+                let previousField = null;
+                if (currentSelectedField.classList.contains("key")) {
+                    previousField = currentSelectedField.parentElement.parentElement.previousElementSibling.children[4].firstElementChild;
+                } else if (currentSelectedField.classList.contains("value")) {
+                    previousField = currentSelectedField.parentElement.parentElement.previousElementSibling.children[5].firstElementChild;
+                }
+                if (previousField !== null && previousField !== undefined) {
+                    previousField.focus();
+                }
+            }
+            else if (e.code === 'ArrowDown') {
+                // down arrow
+                let nextField = null;
+                if (currentSelectedField.classList.contains("key")) {
+                    nextField = currentSelectedField.parentElement.parentElement.nextElementSibling.children[4].firstElementChild;
+                } else if (currentSelectedField.classList.contains("value")) {
+                    nextField = currentSelectedField.parentElement.parentElement.nextElementSibling.children[5].firstElementChild;
+                }
+                if (nextField !== null && nextField !== undefined) {
+                    nextField.focus();
+                }
+            }
+            else if (e.code === 'ArrowLeft') {
+                // left arrow
+                let previousField = null;
+                if (currentSelectedField.classList.contains("value")) {
+                    previousField = currentSelectedField.parentElement.previousElementSibling.firstElementChild;
+                }
+                if (previousField !== null && previousField !== undefined) {
+                    previousField.focus();
+                }
+            }
+            else if (e.code === 'ArrowRight') {
+                // right arrow
+                let nextField = null;
+                if (currentSelectedField.classList.contains("key")) {
+                    nextField = currentSelectedField.parentElement.nextElementSibling.firstElementChild;
+                }
+                if (nextField !== null && nextField !== undefined) {
+                    nextField.focus();
+                }
+            }
+        }
+    } catch (ex) {
+        console.log("Error while changing focus on arrow key: ", ex);
+    }
+}
+
+
 async function getCoords(img, position) {
     const imgWidth = img.clientWidth;
     const imgHeight = img.clientHeight;
@@ -450,6 +524,7 @@ async function annotateImgBboxes(imgToBeAnnotated, annotations, activate, activa
 
 const clearImageBBoxes = () => {
     maxBboxId = 0;
+    idSet.clear();
     while (img_container.childElementCount > 3) {
         img_container.lastElementChild.remove();
     }
@@ -526,6 +601,7 @@ const handleImgUpload = (e) => {
 
 const img_container = document.getElementById("img_container");
 const img_upload = document.getElementById("img_upload");
+const key_value_tab = document.getElementById("key_value_tab");
 const fields_to_be_annotated = document.getElementsByClassName("field_to_be_annotated");
 const navbarHeight = document.getElementById("navbar").getBoundingClientRect().height;
 const img_container_margin = parseInt(getComputedStyle(img_container).margin);
@@ -542,8 +618,10 @@ let isDragging = false;
 let standardKeyOptions = [];
 let maxBboxId = 0;
 let drawArrows = false;
+let idSet = new Set();
 
 img_upload.onchange = handleImgUpload;
+key_value_tab.onkeydown = changeFocusOnArrowKey;
 
 for (let idx = 0; idx < standardKeyOptionsList.options.length; idx++) {
     standardKeyOptions.push(standardKeyOptionsList.options[idx].value);
@@ -559,4 +637,4 @@ Array.from(fields_to_be_annotated).forEach(function (element) {
 
 
 
-export { annotateImgBboxes, annotateImgWordBboxes, clearImageBBoxes, handleChangeInStandardKey, handleSelectField, standardKeyOptions, updateDrawArrows };
+export { annotateImgBboxes, annotateImgWordBboxes, clearImageBBoxes, handleChangeInStandardKey, handleSelectField, standardKeyOptions, updateDrawArrows, deleteIds };
