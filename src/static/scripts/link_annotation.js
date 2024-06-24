@@ -1,4 +1,4 @@
-import { handleChangeInStandardKey, handleSelectField } from "./common.js";
+import { handleChangeInStandardKey, handleSelectField, deleteIds } from "./common.js";
 import { unlinkParagraph } from "./load_annotations.js";
 
 const handleDeleteKeyValue = (e) => {
@@ -10,8 +10,16 @@ const handleDeleteKeyValue = (e) => {
     }
 
     if (currentKeyValueRow.parentElement.childElementCount > 1) {
-        if (currentKeyValueRow.children[4].firstElementChild.value !== undefined && currentKeyValueRow.children[4].firstElementChild.value !== null && currentKeyValueRow.children[4].firstElementChild.value !== "") {
-            unlinkParagraph(currentKeyValueRow.children[4].firstElementChild.value.split(", "));
+        try {
+            if (currentKeyValueRow.children[4].firstElementChild.value !== undefined && currentKeyValueRow.children[4].firstElementChild.value !== null && currentKeyValueRow.children[4].firstElementChild.value !== "") {
+                unlinkParagraph(currentKeyValueRow.children[4].firstElementChild.value.split(", "));
+                deleteIds(currentKeyValueRow.children[4].firstElementChild.value.split(", "));
+            }
+            if (currentKeyValueRow.children[5].firstElementChild.value !== undefined && currentKeyValueRow.children[5].firstElementChild.value !== null && currentKeyValueRow.children[5].firstElementChild.value !== "") {
+                deleteIds(currentKeyValueRow.children[5].firstElementChild.value.split(", "));
+            }
+        } catch (error) {
+            console.error("Error in unlinking or deleting ids", error);
         }
         currentKeyValueRow.remove();
     }
