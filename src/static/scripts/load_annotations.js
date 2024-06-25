@@ -175,6 +175,13 @@ const updateParagraphData = () => {
                                     }
                                 });
                         } else {
+                            if (lineItemNo.value === null || lineItemNo.value === undefined) {
+                                lineItemNo.value = "";
+                            } else {
+                                lineItemNo.value = lineItemNo.value.replaceAll(" ", "");
+                            }
+                            let line_item_nums = lineItemNo.value?.split(",")
+                            let line_item_nums_idx = 0;
                             value.value?.split(", ")
                                 .filter(ele => (!isNaN(ele) && !ele.includes(".") && !ele.includes("-")))
                                 .forEach(function (value_element) {
@@ -183,8 +190,12 @@ const updateParagraphData = () => {
                                         if (!(value_element === null || value_element === undefined || value_element.replaceAll(" ", "") === "")) {
                                             console.log("populating value");
                                             paragraphs[parseInt(value_element)].standardKey = standardKey.value || "MISC";
-                                            paragraphs[parseInt(value_element)].line_num = lineItemNo.value || "";
-                                            paragraphs[parseInt(value_element)].isHeader = isHeader.checked || false;
+                                            if (line_item_nums_idx < line_item_nums.length) {
+                                                paragraphs[parseInt(value_element)].line_num = line_item_nums[line_item_nums_idx] || "";
+                                            } else {
+                                                paragraphs[parseInt(value_element)].line_num = "";
+                                            }
+                                            paragraphs[parseInt(value_element)].isHeader = false;
                                         }
                                     } catch (ex) {
                                         console.log("Error while updating linking data: ", ex);
