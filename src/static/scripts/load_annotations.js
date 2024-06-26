@@ -56,9 +56,11 @@ const deselectParagraph = (paragraph_idx_list, paragraph_to_deselect_idx) => {
         console.log("paragraph_idx_list: ", paragraph_idx_list);
         console.log("paragraph_to_deselect_idx: ", paragraph_to_deselect_idx);
         for (let paragraph_idx of paragraph_idx_list) {
-            console.log("paragraph_idx: ", paragraph_idx);
-            if (paragraphs[parseInt(paragraph_idx)].linking.includes(parseInt(paragraph_to_deselect_idx))) {
-                paragraphs[parseInt(paragraph_idx)].linking = paragraphs[parseInt(paragraph_idx)].linking.filter(ele => ele !== parseInt(paragraph_to_deselect_idx));
+            if (paragraph_idx !== undefined && paragraph_idx !== null && paragraph_idx !== "" && !isNaN(paragraph_idx)) {
+                console.log("paragraph_idx: ", paragraph_idx);
+                if (paragraphs[parseInt(paragraph_idx)].linking.includes(parseInt(paragraph_to_deselect_idx))) {
+                    paragraphs[parseInt(paragraph_idx)].linking = paragraphs[parseInt(paragraph_idx)].linking.filter(ele => ele !== parseInt(paragraph_to_deselect_idx));
+                }
             }
         }
     } catch (ex) {
