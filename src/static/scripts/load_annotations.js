@@ -157,6 +157,10 @@ const updateParagraphData = () => {
                             paragraphs[parseInt(key_element)].line_num = lineItemNo.value || "";
                             paragraphs[parseInt(key_element)].isHeader = isHeader.checked || false;
 
+                            if (value.value === null || value.value === undefined || value.value.replaceAll(" ", "") === "") {
+                                paragraphs[parseInt(key_element)].linking = [];
+                            }
+
                             value.value?.split(", ")
                                 .filter(ele => (!isNaN(ele) && !ele.includes(".") && !ele.includes("-")))
                                 .forEach(function (value_element) {
