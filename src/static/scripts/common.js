@@ -73,7 +73,7 @@ const handleSelectBbox = (e) => {
             if (idSet.has(e.target.getAttribute("data-bs-title").trim())) {
                 console.log("Already selected: ", e.target.getAttribute("data-bs-title").trim());
                 alert("Already selected: " + e.target.getAttribute("data-bs-title").trim());
-                return;
+                // return;
             }
             if (currentSelectedField.value === "") {
                 currentSelectedField.value = e.target.getAttribute("data-bs-title").trim();
