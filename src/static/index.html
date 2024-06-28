@@ -39,8 +39,30 @@
                 <li class="nav-item" id="key_value_tab_btn">
                     <span class="nav-link active link-span">Links</span>
                 </li>
+                <li class="nav-item flex-shrink-1" id="delete_all_nav_item">
+                    <button type="button link-span" class="btn" id="delete_all_btn"><i
+                            class="bi bi-trash-fill"></i></button>
+                </li>
                 <li class="nav-item">
-                    <button type="button" class="btn" id="delete_all_btn"><i class="bi bi-trash-fill"></i></button>
+                    <input type="radio" class="btn-check" name="field-filter" id="see-all-btn" value="seeAll"
+                        autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="see-all-btn">
+                        See All <i class="bi bi-eye-fill"></i>
+                    </label>
+                </li>
+                <li class="nav-item">
+                    <input type="radio" class="btn-check" name="field-filter" id="linked-btn" value="linked"
+                        autocomplete="off">
+                    <label class="btn btn-outline-primary" for="linked-btn">
+                        Linked <i class="bi bi-link-45deg"></i>
+                    </label>
+                </li>
+                <li class="nav-item">
+                    <input type="radio" class="btn-check" name="field-filter" value="unlinked" id="unlinked-btn"
+                        autocomplete="off">
+                    <label class="btn btn-outline-primary" for="unlinked-btn">
+                        Unlinked <i class="bi bi-link-45deg"></i>
+                    </label>
                 </li>
             </ul>
             <div id="key_value_tab">

@@ -380,6 +380,34 @@ const handleChangeInStandardKey = (e) => {
     }
 };
 
+const filterFields = (e) => {
+    const filterValue = e.target.value;
+    const key_values = document.getElementsByClassName("key_value");
+    try {
+        Array.from(key_values).forEach(function (element) {
+            if (filterValue === "seeAll") {
+                element.classList.remove("hide");
+            } else if (filterValue === "linked") {
+                if (!(element.children[4].firstElementChild.value?.length > 0
+                    && element.children[5].firstElementChild.value?.length > 0)) {
+                    element.classList.add("hide");
+                } else {
+                    element.classList.remove("hide");
+                }
+            } else {
+                if (element.children[4].firstElementChild.value?.length > 0
+                    && element.children[5].firstElementChild.value?.length > 0) {
+                    element.classList.add("hide");
+                } else {
+                    element.classList.remove("hide");
+                }
+            }
+        });
+    } catch (ex) {
+        console.log("Error while filtering fields: ", ex);
+    }
+};
+
 
 const deleteIds = (idsToDelete) => {
     try {
@@ -662,6 +690,10 @@ let idSet = new Set();
 
 img_upload.onchange = handleImgUpload;
 key_value_tab.onkeydown = changeFocusOnArrowKey;
+
+document.querySelectorAll('input[name="field-filter"]').forEach((elem) => {
+    elem.addEventListener("change", filterFields);
+});
 
 for (let idx = 0; idx < standardKeyOptionsList.options.length; idx++) {
     standardKeyOptions.push(standardKeyOptionsList.options[idx].value);

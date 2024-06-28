@@ -27,6 +27,35 @@ input[type=number]::-webkit-outer-spin-button {
     background-color: #F9F7F7;
 }
 
+#delete_all_nav_item {
+    max-width: 3rem;
+}
+
+
+.btn-outline-primary {
+    color: #112D4E;
+    border-color: #3F72AF;
+}
+
+.btn-check:checked+.btn,
+.btn.active,
+.btn.focus,
+.btn.show,
+.btn:first-child:active,
+:not(.btn-check)+.btn:active {
+    color: #F9F7F7 !important;
+    background-color: #3F72AF !important;
+    border-color: #3F72AF !important;
+}
+
+.btn-check:checked+.btn,
+.btn.active,
+.btn.show,
+.btn:first-child:active,
+:not(.btn-check)+.btn:active i {
+    color: #F9F7F7 !important;
+}
+
 .content-area {
     width: 98vw;
 }
@@ -129,10 +158,6 @@ input[type=number]::-webkit-outer-spin-button {
 label {
     color: #112D4E;
     font-weight: 400;
-}
-
-i {
-    color: #112D4E;
 }
 
 .wordbbox {
@@ -248,7 +273,7 @@ i {
 }
 
 .hide {
-    display: none;
+    display: none !important;
 }
 
 .invalid-input {
