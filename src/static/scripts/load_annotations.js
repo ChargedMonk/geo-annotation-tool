@@ -94,8 +94,8 @@ const deleteParagraph = (e) => {
 
         const keyValueFields = document.getElementsByClassName("key_value");
         for (let keyValueField of keyValueFields) {
-            const key = keyValueField.children[3].firstElementChild;
-            const value = keyValueField.children[4].firstElementChild;
+            const key = keyValueField.children[4].firstElementChild;
+            const value = keyValueField.children[5].firstElementChild;
 
             key.value = key.value.split(", ").filter(ele => ele !== currentParagraphIndex).join(", ");
             value.value = value.value.split(", ").filter(ele => ele !== currentParagraphIndex).join(", ");
@@ -157,6 +157,7 @@ const updateParagraphData = () => {
 
                             paragraphs[parseInt(key_element)].line_num = lineItemNo.value || "";
                             paragraphs[parseInt(key_element)].isHeader = isHeader.checked || false;
+                            paragraphs[parseInt(key_element)].type = "KEY";
 
                             if (value.value === null || value.value === undefined || value.value.replaceAll(" ", "") === "") {
                                 paragraphs[parseInt(key_element)].linking = [];
@@ -171,6 +172,7 @@ const updateParagraphData = () => {
                                         } else {
                                             if (!paragraphs[parseInt(key_element)].linking.includes(parseInt(value_element))) {
                                                 paragraphs[parseInt(key_element)].linking.push(parseInt(value_element));
+                                                paragraphs[parseInt(value_element)].type = "VALUE";
                                             }
                                         }
                                     } catch (ex) {
@@ -203,6 +205,7 @@ const updateParagraphData = () => {
                                                 paragraphs[parseInt(value_element)].line_num = "";
                                             }
                                             paragraphs[parseInt(value_element)].isHeader = false;
+                                            paragraphs[parseInt(value_element)].type = "VALUE";
                                         }
                                     } catch (ex) {
                                         console.log("Error while updating linking data: ", ex);
@@ -243,9 +246,13 @@ const loadKeyValueData = (keyValueData) => {
             // && keyValueData[idx].linking.length > 0
         ) {
             validLinkingsLength += 1;
-            keyValueData[idx].linking.forEach((linking) => {
-                keysNotToShow.add(linking);
-            });
+            if ('status' in keyValueData[idx] && keyValueData[idx].status === "DELETED") {
+                validLinkingsLength -= 1;
+            } else {
+                keyValueData[idx].linking.forEach((linking) => {
+                    keysNotToShow.add(linking);
+                });
+            }
         }
     }
     validLinkingsLength -= keysNotToShow.size;
@@ -270,8 +277,8 @@ const loadKeyValueData = (keyValueData) => {
                 (!keysNotToShow.has(idx)) &&
                 // keyValueData[idx].linking.length > 0 &&
                 (
-                    ("status" in keyValueData[idx] && keyValueData[idx].status !== "DELETED") ||
-                    !("status" in keyValueData[idx])
+                    !("status" in keyValueData[idx]) ||
+                    ("status" in keyValueData[idx] && keyValueData[idx].status !== "DELETED")
                 )) {
                 const standard_key = keyValues[keyValueFieldCounter].children[1].firstElementChild;
                 const isHeader = keyValues[keyValueFieldCounter].children[2].firstElementChild;
@@ -300,23 +307,49 @@ const loadKeyValueData = (keyValueData) => {
                 console.log("isHeader.checked: ", keyValueData[idx].isHeader, "->", isHeader.checked);
                 isHeader.checked = keyValueData[idx].isHeader;
 
-                try {
-                    key.dispatchEvent(new Event('focus'));
-                    document.getElementById(`bbox_${idx + 1}`)?.dispatchEvent(new Event('click'));
-                } catch (ex) {
-                    console.log(`Error in loading key value: [${idx}]`, ex);
-                    console.log("keyValueData[idx].key: ", keyValueData[idx].key);
-                    alert("Error in loading key value:\n" + ex);
-                }
-
-                for (let linking of keyValueData[idx].linking) {
+                if ("type" in keyValueData[idx]
+                    && (keyValueData[idx].type === "KEY" || keyValueData[idx].type === "VALUE")
+                    && (keyValueData[idx].linking === null
+                        || keyValueData[idx].linking === undefined
+                        || keyValueData[idx].linking.length < 1)) {
+                    if (keyValueData[idx].type === "KEY") {
+                        try {
+                            key.dispatchEvent(new Event('focus'));
+                            document.getElementById(`bbox_${idx + 1}`)?.dispatchEvent(new Event('click'));
+                        } catch (ex) {
+                            console.log(`Error in loading key value: [${idx}]`, ex);
+                            console.log("keyValueData[idx].key: ", keyValueData[idx].key);
+                            alert("Error in loading key value:\n" + ex);
+                        }
+                    } else if (keyValueData[idx].type === "VALUE") {
+                        try {
+                            value.dispatchEvent(new Event('focus'));
+                            document.getElementById(`bbox_${idx + 1}`)?.dispatchEvent(new Event('click'));
+                        } catch (ex) {
+                            console.log(`Error in loading key value: [${idx}]`, ex);
+                            console.log("keyValueData[idx].linking: ", linking);
+                            alert("Error in loading key value:\n" + ex);
+                        }
+                    }
+                } else {
                     try {
-                        value.dispatchEvent(new Event('focus'));
-                        document.getElementById(`bbox_${linking + 1}`)?.dispatchEvent(new Event('click'));
+                        key.dispatchEvent(new Event('focus'));
+                        document.getElementById(`bbox_${idx + 1}`)?.dispatchEvent(new Event('click'));
                     } catch (ex) {
                         console.log(`Error in loading key value: [${idx}]`, ex);
-                        console.log("keyValueData[idx].linking: ", linking);
+                        console.log("keyValueData[idx].key: ", keyValueData[idx].key);
                         alert("Error in loading key value:\n" + ex);
+                    }
+
+                    for (let linking of keyValueData[idx].linking) {
+                        try {
+                            value.dispatchEvent(new Event('focus'));
+                            document.getElementById(`bbox_${linking + 1}`)?.dispatchEvent(new Event('click'));
+                        } catch (ex) {
+                            console.log(`Error in loading key value: [${idx}]`, ex);
+                            console.log("keyValueData[idx].linking: ", linking);
+                            alert("Error in loading key value:\n" + ex);
+                        }
                     }
                 }
                 keyValueFieldCounter += 1;
@@ -505,7 +538,7 @@ const handleAnnotationsUpload = (e) => {
 
 
 class ParagraphObject {
-    constructor(idx, standardKey, word_ids, bbox, linking, line_num, isHeader, status) {
+    constructor(idx, standardKey, word_ids, bbox, linking, line_num, isHeader, status, type) {
         this.index = idx;
         this.standardKey = standardKey;
         this.word_ids = word_ids;
@@ -514,6 +547,7 @@ class ParagraphObject {
         this.line_num = line_num;
         this.isHeader = isHeader;
         this.status = status;
+        this.type = type;
     }
 }
 

@@ -182,7 +182,7 @@ const handleDragMove = (e) => {
 
 const handleDragEnd = (e) => {
     if (isDragging) {
-        console.log("e.ctrlKey: ", e.ctrlKey, "\ne ", e);
+        console.log("e ", e);
 
         if (e.ctrlKey) {
             const bboxes = document.getElementsByClassName("bbox");
@@ -216,6 +216,43 @@ const handleDragEnd = (e) => {
                 try {
                     if (element !== undefined && element !== null) {
                         handleSelectBbox({ "target": element });
+                    }
+                } catch (ex) {
+                    console.log("Error while selecting bbox for paragraph: ", ex);
+                }
+            });
+        } else if (e.shiftKey) {
+            const bboxes = document.getElementsByClassName("bbox");
+            let validBboxes = [];
+            Array.from(bboxes).forEach(function (element) {
+                const elementLeft = parseInt(element.style.left);
+                const elementTop = parseInt(element.style.top);
+                const elementRight = elementLeft + parseInt(element.style.width);
+                const elementBottom = elementTop + parseInt(element.style.height);
+                if (elementLeft >= parseInt(dragRect.style.left) && elementTop >= parseInt(dragRect.style.top)
+                    && elementRight <= (parseInt(dragRect.style.left) + parseInt(dragRect.style.width))
+                    && elementBottom <= (parseInt(dragRect.style.top) + parseInt(dragRect.style.height))) {
+                    validBboxes.push(element);
+                }
+            });
+
+            // Sorting the bboxes by their positions since we want to go from top-left to bottom right
+            validBboxes.sort((a, b) => ((Math.round(parseInt(a.style.top) / 10) * 10) - (Math.round(parseInt(b.style.top) / 10) * 10))
+                || (parseInt(a.style.left) - parseInt(b.style.left)));
+
+            console.log("sorted valid bboxes:", validBboxes);
+
+            const imgWidth = img.clientWidth;
+            const imgHeight = img.clientHeight;
+            const imgNaturalWidth = img.naturalWidth;
+            const imgNaturalHeight = img.naturalHeight;
+            const ratioX = imgNaturalWidth / imgWidth;
+            const ratioY = imgNaturalHeight / imgHeight;
+
+            validBboxes.forEach(function (element) {
+                try {
+                    if (element !== undefined && element !== null) {
+                        element.lastElementChild.dispatchEvent(new Event('click'));
                     }
                 } catch (ex) {
                     console.log("Error while selecting bbox for paragraph: ", ex);
