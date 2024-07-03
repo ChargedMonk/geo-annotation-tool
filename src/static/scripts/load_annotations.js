@@ -267,6 +267,8 @@ const loadKeyValueData = (keyValueData) => {
         }
     }
 
+    console.log("validLinkingsLength: ", validLinkingsLength);
+
     let keyValueFieldCounter = 0;
 
     for (let idx = 0; idx < keyValueData.length; idx++) {
@@ -353,10 +355,15 @@ const loadKeyValueData = (keyValueData) => {
                     }
                 }
                 keyValueFieldCounter += 1;
+                if (keyValueFieldCounter >= keyValues.length) {
+                    break;
+                }
             }
         } catch (e) {
             console.log("Error in loading key value: ", e);
-            console.log("keyValueData[idx]: ", keyValueData[idx]);
+            console.log("keyValueFieldCounter: ", keyValueFieldCounter);
+            console.log("keyValueData[", idx, "]: ", keyValueData[idx]);
+            console.log("keyValues:\n", keyValues);
             alert("Error in loading key value:\n" + e);
         }
     }
