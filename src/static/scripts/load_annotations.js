@@ -189,7 +189,10 @@ const updateParagraphData = () => {
                             } else {
                                 lineItemNo.value = lineItemNo.value.replaceAll(" ", "");
                             }
-                            let line_item_nums = lineItemNo.value?.split(",")
+                            let line_item_nums = lineItemNo.value?.split(",");
+                            if (line_item_nums.length === 1) {
+                                line_item_nums = Array(value.value?.split(", ").length || 1).fill(line_item_nums[0]);
+                            }
                             let line_item_nums_idx = 0;
                             value.value?.split(", ")
                                 .filter(ele => (!isNaN(ele) && !ele.includes(".") && !ele.includes("-")))
@@ -206,6 +209,7 @@ const updateParagraphData = () => {
                                             }
                                             paragraphs[parseInt(value_element)].isHeader = false;
                                             paragraphs[parseInt(value_element)].type = "VALUE";
+                                            line_item_nums_idx++;
                                         }
                                     } catch (ex) {
                                         console.log("Error while updating linking data: ", ex);
