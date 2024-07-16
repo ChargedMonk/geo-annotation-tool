@@ -16,6 +16,7 @@ const handleDeleteKeyValue = (e) => {
                 deleteIds(currentKeyValueRow.children[4].firstElementChild.value.split(", "));
             }
             if (currentKeyValueRow.children[5].firstElementChild.value !== undefined && currentKeyValueRow.children[5].firstElementChild.value !== null && currentKeyValueRow.children[5].firstElementChild.value !== "") {
+                 unlinkParagraph(currentKeyValueRow.children[5].firstElementChild.value.split(", "));
                 deleteIds(currentKeyValueRow.children[5].firstElementChild.value.split(", "));
             }
         } catch (error) {
