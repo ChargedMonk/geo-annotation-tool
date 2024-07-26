@@ -9,8 +9,9 @@ const resetAnnotationData = () => {
 };
 
 const deleteAllRows = () => {
+    const keyValues = document.getElementsByClassName("key_value");
+
     try {
-        const keyValues = document.getElementsByClassName("key_value");
         while (keyValues.length > 1) {
             handleDeleteKeyValue({ "target": keyValues[keyValues.length - 1].firstElementChild.firstElementChild });
         }
@@ -30,6 +31,9 @@ const unlinkParagraph = (paragraph_idx_list) => {
             paragraphs[parseInt(paragraph_idx)].linking = [];
             paragraphs[parseInt(paragraph_idx)].line_num = "";
             paragraphs[parseInt(paragraph_idx)].standardKey = "MISC";
+            if (document.getElementById(`bbox_${parseInt(paragraph_idx) + 1}`) !== undefined && document.getElementById(`bbox_${parseInt(paragraph_idx) + 1}`) !== null) {
+                document.getElementById(`bbox_${parseInt(paragraph_idx) + 1}`).style.backgroundColor = '';
+            }
         }
     } catch (ex) {
         console.log("Error while unlinking paragraph: ", ex);
@@ -100,7 +104,11 @@ const deleteParagraph = (e) => {
             key.value = key.value.split(", ").filter(ele => ele !== currentParagraphIndex).join(", ");
             value.value = value.value.split(", ").filter(ele => ele !== currentParagraphIndex).join(", ");
         }
+        for (let i = 0; i < paragraphs.length; i++) {
+            paragraphs[i].linking = paragraphs[i].linking.filter(ele => ele !== parseInt(currentParagraphIndex));
+        }
         paragraphs[parseInt(currentParagraphIndex)].status = "DELETED";
+        paragraphs[parseInt(currentParagraphIndex)].linking = [];
         Array.from(document.getElementsByClassName("leader-line")).forEach(function (element) {
             if (element.classList.length === 1) {
                 element.remove();
@@ -200,7 +208,6 @@ const updateParagraphData = () => {
                                     console.log("value_element: ", value_element);
                                     try {
                                         if (!(value_element === null || value_element === undefined || value_element.replaceAll(" ", "") === "")) {
-                                            console.log("populating value");
                                             paragraphs[parseInt(value_element)].standardKey = standardKey.value || "MISC";
                                             if (line_item_nums_idx < line_item_nums.length) {
                                                 paragraphs[parseInt(value_element)].line_num = line_item_nums[line_item_nums_idx] || "";
@@ -310,7 +317,6 @@ const loadKeyValueData = (keyValueData) => {
                     lineItemNo.value = keyValueData[idx].line_num;
                 }
 
-                console.log("isHeader.checked: ", keyValueData[idx].isHeader, "->", isHeader.checked);
                 isHeader.checked = keyValueData[idx].isHeader;
 
                 if ("type" in keyValueData[idx]

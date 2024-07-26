@@ -69,7 +69,6 @@ const handleSelectBbox = (e) => {
     try {
         // Cannot select a bbox again
         if (currentSelectedField !== undefined && currentSelectedField !== null && e.target.tagName === "DIV") {
-            console.log("idSet: ", idSet);
             if (idSet.has(e.target.getAttribute("data-bs-title").trim())) {
                 console.log("Already selected: ", e.target.getAttribute("data-bs-title").trim());
                 alert("Already selected: " + e.target.getAttribute("data-bs-title").trim());
@@ -124,7 +123,6 @@ const handleDeselectBbox = (e) => {
             }
 
             if (currBboxIdx > -1) {
-                console.log("idSet: ", idSet);
                 idSet.delete(e.target.getAttribute("data-bs-title").trim());
                 currBboxes.splice(currBboxIdx, 1);
                 let currentSelectedFieldValueList = currentSelectedField.value.split(", ");
