@@ -256,6 +256,66 @@ const handleDragEnd = (e) => {
                     console.log("Error while selecting bbox for paragraph: ", ex);
                 }
             });
+        } else if (e.altKey) {
+            const wordbboxes = document.getElementsByClassName("wordbbox");
+            let validwordBboxes = [];
+            Array.from(wordbboxes).forEach(function (element) {
+                const elementLeft = parseFloat(element.style.left);
+                const elementTop = parseFloat(element.style.top);
+                const elementRight = elementLeft + parseFloat(element.style.width);
+                const elementBottom = elementTop + parseFloat(element.style.height);
+                if (elementLeft >= parseFloat(dragRect.style.left) && elementTop >= parseFloat(dragRect.style.top)
+                    && elementRight <= (parseFloat(dragRect.style.left) + parseFloat(dragRect.style.width))
+                    && elementBottom <= (parseFloat(dragRect.style.top) + parseFloat(dragRect.style.height))) {
+                    validwordBboxes.push(element);
+                }
+            });
+
+            // // Sorting the bboxes by their positions since we want to go from top-left to bottom right
+            // validwordBboxes.sort((a, b) => ((Math.round(parseInt(a.style.top) / 10) * 10) - (Math.round(parseInt(b.style.top) / 10) * 10))
+            //     || (parseInt(a.style.left) - parseInt(b.style.left)));
+
+            const imgWidth = img.clientWidth;
+            const imgHeight = img.clientHeight;
+            const imgNaturalWidth = img.naturalWidth;
+            const imgNaturalHeight = img.naturalHeight;
+            const ratioX = imgNaturalWidth / imgWidth;
+            const ratioY = imgNaturalHeight / imgHeight;
+
+            validwordBboxes.forEach(function (element) {
+                try {
+                    let minX = null;
+                    let minY = null;
+                    let maxX = null;
+                    let maxY = null;
+
+                    const word_ids = []
+                    let paragraph_content = "";
+                    if (element !== undefined && element !== null) {
+                        const word_id = element.id.replace(/\D/g, '');
+                        if (word_id === "" || isNaN(word_id)) {
+                            return;
+                        }
+                        paragraph_content += element.getAttribute("data-bs-title") + " ";
+                        console.log("word_id: ", word_id, "word: ", element.getAttribute("data-bs-title"));
+                        word_ids.push(parseInt(word_id) - 1);
+                        minX = Math.min(minX || parseFloat(element.style.left), parseFloat(element.style.left));
+                        minY = Math.min(minY || parseFloat(element.style.top), parseFloat(element.style.top));
+                        maxX = Math.max(maxX || parseFloat(element.style.width), parseFloat(element.style.left) + parseFloat(element.style.width));
+                        maxY = Math.max(maxY || parseFloat(element.style.height), parseFloat(element.style.top) + parseFloat(element.style.height));
+                        const paragraph_bbox = [minX * ratioX, minY * ratioY, maxX * ratioX, maxY * ratioY];
+
+                        annotateImgBboxes(document.getElementById("img"),
+                            [[paragraph_content.trim(), paragraph_bbox]],
+                            false,
+                            'rgba(255, 255, 255, 0)');
+
+                        addNewParagraph(word_ids, paragraph_bbox);
+                    }
+                } catch (ex) {
+                    console.log("Error while calculating minimum bounding rect bbox for paragraph: ", ex);
+                }
+            });
         } else {
             const wordbboxes = document.getElementsByClassName("wordbbox");
             let validwordBboxes = [];
