@@ -162,6 +162,58 @@ const handleDragStart = (e) => {
     dragRect.style.top = dragCursorStartY + "px";
 };
 
+const handleMakeParagraph = (validwordBboxes) => {
+    console.log('making paragraphzzz');
+    // Sorting the bboxes by their positions since we want to go from top-left to bottom right
+    validwordBboxes.sort((a, b) => ((Math.round(parseInt(a.style.top) / 10) * 10) - (Math.round(parseInt(b.style.top) / 10) * 10))
+        || (parseInt(a.style.left) - parseInt(b.style.left)));
+
+    const imgWidth = img.clientWidth;
+    const imgHeight = img.clientHeight;
+    const imgNaturalWidth = img.naturalWidth;
+    const imgNaturalHeight = img.naturalHeight;
+    const ratioX = imgNaturalWidth / imgWidth;
+    const ratioY = imgNaturalHeight / imgHeight;
+    let minX = null;
+    let minY = null;
+    let maxX = null;
+    let maxY = null;
+
+    const word_ids = []
+    let paragraph_content = "";
+
+    validwordBboxes.forEach(function (element) {
+        try {
+            if (element !== undefined && element !== null) {
+                const word_id = element.id.replace(/\D/g, '');
+                if (word_id === "" || isNaN(word_id)) {
+                    return;
+                }
+                paragraph_content += element.getAttribute("data-bs-title") + " ";
+                // console.log("word_id: ", word_id, "word: ", element.getAttribute("data-bs-title"));
+                word_ids.push(parseInt(word_id) - 1);
+                minX = Math.min(minX || parseFloat(element.style.left), parseFloat(element.style.left));
+                minY = Math.min(minY || parseFloat(element.style.top), parseFloat(element.style.top));
+                maxX = Math.max(maxX || parseFloat(element.style.width), parseFloat(element.style.left) + parseFloat(element.style.width));
+                maxY = Math.max(maxY || parseFloat(element.style.height), parseFloat(element.style.top) + parseFloat(element.style.height));
+            }
+        } catch (ex) {
+            console.log("Error while calculating minimum bounding rect bbox for paragraph: ", ex);
+        }
+    });
+
+    if (validwordBboxes.length > 0) {
+        const paragraph_bbox = [minX * ratioX, minY * ratioY, maxX * ratioX, maxY * ratioY];
+
+        annotateImgBboxes(document.getElementById("img"),
+            [[paragraph_content.trim(), paragraph_bbox]],
+            false,
+            'rgba(255, 255, 255, 0)');
+
+        addNewParagraph(word_ids, paragraph_bbox);
+    }
+};
+
 const handleDragMove = (e) => {
     if (isDragging && e.which === 1) {
         const dragLeft = (e.clientX - img_container_margin < dragCursorStartX) ? e.clientX - img_container_margin : dragCursorStartX;
@@ -182,7 +234,37 @@ const handleDragEnd = (e) => {
     if (isDragging) {
         console.log("e ", e);
 
-        if (e.ctrlKey) {
+        if (e.ctrlKey && e.altKey) {
+            let validWordBboxes = [];
+            let height = 0;
+            const wordbboxes = document.getElementsByClassName("wordbbox");
+            Array.from(wordbboxes).forEach(function (element) {
+                const elementLeft = parseFloat(element.style.left);
+                const elementTop = parseFloat(element.style.top);
+                const elementRight = elementLeft + parseFloat(element.style.width);
+                const elementBottom = elementTop + parseFloat(element.style.height);
+                const dTop = parseFloat(dragRect.style.top);
+                if (elementLeft >= parseFloat(dragRect.style.left) && elementTop >= parseFloat(dragRect.style.top)
+                    && elementRight <= (parseFloat(dragRect.style.left) + parseFloat(dragRect.style.width))
+                    && elementBottom <= (parseFloat(dragRect.style.top) + parseFloat(dragRect.style.height))) {
+                    if (height === 0) {
+                        height = elementTop - dTop;
+                        validWordBboxes.push(element);
+                    } else if ((elementTop - dTop) <= (height + 10) && (elementTop - dTop) >= (height - 10)) {
+                        validWordBboxes.push(element);
+                    } else {
+                        height = elementTop - dTop;
+                        handleMakeParagraph(validWordBboxes);
+                        validWordBboxes = [];
+                        validWordBboxes.push(element);
+                    }
+                }
+            });
+            if (validWordBboxes.length > 0) {
+                handleMakeParagraph(validWordBboxes);
+            }
+        }
+        else if (e.ctrlKey) {
             const bboxes = document.getElementsByClassName("bbox");
             let validBboxes = [];
             Array.from(bboxes).forEach(function (element) {
@@ -330,55 +412,7 @@ const handleDragEnd = (e) => {
                     validwordBboxes.push(element);
                 }
             });
-
-            // Sorting the bboxes by their positions since we want to go from top-left to bottom right
-            validwordBboxes.sort((a, b) => ((Math.round(parseInt(a.style.top) / 10) * 10) - (Math.round(parseInt(b.style.top) / 10) * 10))
-                || (parseInt(a.style.left) - parseInt(b.style.left)));
-
-            const imgWidth = img.clientWidth;
-            const imgHeight = img.clientHeight;
-            const imgNaturalWidth = img.naturalWidth;
-            const imgNaturalHeight = img.naturalHeight;
-            const ratioX = imgNaturalWidth / imgWidth;
-            const ratioY = imgNaturalHeight / imgHeight;
-            let minX = null;
-            let minY = null;
-            let maxX = null;
-            let maxY = null;
-
-            const word_ids = []
-            let paragraph_content = "";
-
-            validwordBboxes.forEach(function (element) {
-                try {
-                    if (element !== undefined && element !== null) {
-                        const word_id = element.id.replace(/\D/g, '');
-                        if (word_id === "" || isNaN(word_id)) {
-                            return;
-                        }
-                        paragraph_content += element.getAttribute("data-bs-title") + " ";
-                        console.log("word_id: ", word_id, "word: ", element.getAttribute("data-bs-title"));
-                        word_ids.push(parseInt(word_id) - 1);
-                        minX = Math.min(minX || parseFloat(element.style.left), parseFloat(element.style.left));
-                        minY = Math.min(minY || parseFloat(element.style.top), parseFloat(element.style.top));
-                        maxX = Math.max(maxX || parseFloat(element.style.width), parseFloat(element.style.left) + parseFloat(element.style.width));
-                        maxY = Math.max(maxY || parseFloat(element.style.height), parseFloat(element.style.top) + parseFloat(element.style.height));
-                    }
-                } catch (ex) {
-                    console.log("Error while calculating minimum bounding rect bbox for paragraph: ", ex);
-                }
-            });
-
-            if (validwordBboxes.length > 0) {
-                const paragraph_bbox = [minX * ratioX, minY * ratioY, maxX * ratioX, maxY * ratioY];
-
-                annotateImgBboxes(document.getElementById("img"),
-                    [[paragraph_content.trim(), paragraph_bbox]],
-                    false,
-                    'rgba(255, 255, 255, 0)');
-
-                addNewParagraph(word_ids, paragraph_bbox);
-            }
+            handleMakeParagraph(validwordBboxes);
         }
 
         isDragging = false;
