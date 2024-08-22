@@ -1,6 +1,7 @@
 import bottle
 from bottle import request, response, route, run, static_file, template
 import json
+import webbrowser
 
 bottle.BaseRequest.MEMFILE_MAX = 100 * 1024 * 1024  # 100 MB
 
@@ -22,4 +23,5 @@ def server_static(filetype, filename):
 
 
 if __name__ == "__main__":
+    webbrowser.open("http://localhost:8080", new=2)
     run(host="localhost", port=8080, debug=True)
