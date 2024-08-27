@@ -14,15 +14,6 @@ function updateDrawArrows(flag) {
     drawArrows = flag;
 }
 
-function debounce(func, wait) {
-    let timeout;
-    return function (...args) {
-        const context = this;
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(context, args), wait);
-    };
-}
-
 function drawLine(elem1, elem2) {
     if (drawArrows) {
         new LeaderLine(
@@ -169,10 +160,10 @@ const handleDragStart = (e) => {
     isDragging = true;
     dragRect.style.left = dragCursorStartX + "px";
     dragRect.style.top = dragCursorStartY + "px";
-    img_container.addEventListener("mousemove", handleDragMove);
 };
 
 const handleMakeParagraph = (validwordBboxes) => {
+    console.log('making paragraphzzz');
     // Sorting the bboxes by their positions since we want to go from top-left to bottom right
     validwordBboxes.sort((a, b) => ((Math.round(parseInt(a.style.top) / 10) * 10) - (Math.round(parseInt(b.style.top) / 10) * 10))
         || (parseInt(a.style.left) - parseInt(b.style.left)));
@@ -225,16 +216,14 @@ const handleMakeParagraph = (validwordBboxes) => {
 
 const handleDragMove = (e) => {
     if (isDragging && e.which === 1) {
-        requestAnimationFrame(() => {
-            const dragLeft = (e.clientX - img_container_margin < dragCursorStartX) ? e.clientX - img_container_margin : dragCursorStartX;
-            const dragTop = ((e.clientY - navbarHeight - img_container_margin + document.documentElement.scrollTop) < dragCursorStartY) ? (e.clientY - navbarHeight - img_container_margin + document.documentElement.scrollTop) : dragCursorStartY;
-            const dragWidth = (e.clientX - img_container_margin < dragCursorStartX) ? (dragCursorStartX - (e.clientX - img_container_margin)) : ((e.clientX - img_container_margin) - dragCursorStartX);
-            const dragHeight = ((e.clientY - navbarHeight - img_container_margin + document.documentElement.scrollTop) < dragCursorStartY) ? (dragCursorStartY - (e.clientY - navbarHeight - img_container_margin + document.documentElement.scrollTop)) : ((e.clientY - navbarHeight - img_container_margin + document.documentElement.scrollTop) - dragCursorStartY);
-            dragRect.style.left = dragLeft + "px";
-            dragRect.style.top = dragTop + "px";
-            dragRect.style.width = dragWidth + "px";
-            dragRect.style.height = dragHeight + "px";
-        });
+        const dragLeft = (e.clientX - img_container_margin < dragCursorStartX) ? e.clientX - img_container_margin : dragCursorStartX;
+        const dragTop = ((e.clientY - navbarHeight - img_container_margin + document.documentElement.scrollTop) < dragCursorStartY) ? (e.clientY - navbarHeight - img_container_margin + document.documentElement.scrollTop) : dragCursorStartY;
+        const dragWidth = (e.clientX - img_container_margin < dragCursorStartX) ? (dragCursorStartX - (e.clientX - img_container_margin)) : ((e.clientX - img_container_margin) - dragCursorStartX);
+        const dragHeight = ((e.clientY - navbarHeight - img_container_margin + document.documentElement.scrollTop) < dragCursorStartY) ? (dragCursorStartY - (e.clientY - navbarHeight - img_container_margin + document.documentElement.scrollTop)) : ((e.clientY - navbarHeight - img_container_margin + document.documentElement.scrollTop) - dragCursorStartY);
+        dragRect.style.left = dragLeft + "px";
+        dragRect.style.top = dragTop + "px";
+        dragRect.style.width = dragWidth + "px";
+        dragRect.style.height = dragHeight + "px";
 
     } else if (isDragging) {
         handleDragEnd(e);
@@ -434,7 +423,6 @@ const handleDragEnd = (e) => {
         dragRect.style.width = "0px";
         dragRect.style.height = "0px";
     }
-    img_container.removeEventListener("mousemove", handleDragMove);
 };
 
 const handleDefaultDragOver = (e) => {
@@ -634,7 +622,6 @@ async function getCoords(img, position) {
 async function annotateImgWordBboxes(imgToBeAnnotated, annotations, activate, activationColor) {
     try {
         await new Promise(r => setTimeout(r, 1));
-        const fragment = document.createDocumentFragment();
         for (let idx = 0; idx < annotations.length; idx++) {
             const [minX, minY, maxX, maxY] = annotations[idx][1];
             // console.log("word:", annotations[idx][0]);
@@ -662,9 +649,10 @@ async function annotateImgWordBboxes(imgToBeAnnotated, annotations, activate, ac
             // bbox.addEventListener('contextmenu', handleDeselectBbox);
             // bbox.addEventListener('mouseover', handleBboxHover);
             // bbox.addEventListener('mouseout', handleBboxNotHover);
-            fragment.appendChild(word_bbox);
+
+            img_container.appendChild(word_bbox);
         }
-        img_container.appendChild(fragment);
+
     } catch (ex) {
         console.log("Error while annotating img:\n", "annotations: ", annotations, "activation: ", activate, " ", activationColor, "\n", ex);
         alert("Error while annotating img:\n" + ex);
@@ -796,7 +784,7 @@ const handleImgUpload = (e) => {
         spinner.classList.add("hide");
 
         img.addEventListener("mousedown", handleDragStart);
-        // img_container.addEventListener("mousemove", handleDragMove);
+        img_container.addEventListener("mousemove", handleDragMove);
         img.addEventListener("mouseup", handleDragEnd);
         img.addEventListener("dragover", handleDefaultDragOver);
 
