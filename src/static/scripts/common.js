@@ -99,6 +99,10 @@ const handleSelectBbox = (e) => {
             }
             e.target.style.backgroundColor = currentSelectedField.style.backgroundColor;
 
+            if (keyToSKMap.has(e.target.getAttribute("data-bs-content")) && currentSelectedField.classList.contains("key")) {
+                currentSelectedField.parentElement.parentElement.children[1].firstElementChild.value = keyToSKMap.get(e.target.getAttribute("data-bs-content"));
+            }
+
             currentSelectedField.dispatchEvent(new Event('focus'));
         }
     } catch (ex) {
@@ -506,6 +510,11 @@ const handleChangeInStandardKey = (e) => {
     } else {
         e.target.classList.remove('invalid-input');
         e.target.classList.add('valid-input');
+        const kv = e.target.parentElement.parentElement.children[4].firstElementChild;
+        if (e.target.value !== "MISC" && kv.classList.contains("key") && kv.value !== undefined && kv.value !== null && kv.value !== "") {
+            const kbbox = document.getElementById("bbox_" + (parseInt(kv.value) + 1));
+            keyToSKMap.set(kbbox.getAttribute("data-bs-content"), e.target.value);
+        }
     }
 };
 
@@ -722,6 +731,7 @@ async function annotateImgBboxes(imgToBeAnnotated, annotations, activate, activa
 const clearImageBBoxes = () => {
     maxBboxId = 0;
     idSet.clear();
+    keyToSKMap.clear();
     while (img_container.childElementCount > 3) {
         img_container.lastElementChild.remove();
     }
@@ -816,6 +826,7 @@ let standardKeyOptions = [];
 let maxBboxId = 0;
 let drawArrows = false;
 let idSet = new Set();
+const keyToSKMap = new Map();
 
 img_upload.onchange = handleImgUpload;
 key_value_tab.onkeydown = changeFocusOnArrowKey;

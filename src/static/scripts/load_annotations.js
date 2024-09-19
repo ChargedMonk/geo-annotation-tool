@@ -308,9 +308,9 @@ const loadKeyValueData = (keyValueData) => {
                         standard_key.classList.add("valid-input");
                     }
                 } else {
-                    standard_key.value = "";
-                    standard_key.classList.remove("valid-input");
-                    standard_key.classList.add("invalid-input");
+                    standard_key.value = "MISC";
+                    standard_key.classList.remove("invalid-input");
+                    standard_key.classList.add("valid-input");
                 }
 
                 if ("line_num" in keyValueData[idx] && keyValueData[idx].line_num !== null && keyValueData[idx].line_num !== undefined) {
