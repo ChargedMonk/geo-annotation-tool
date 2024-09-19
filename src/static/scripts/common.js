@@ -99,8 +99,8 @@ const handleSelectBbox = (e) => {
             }
             e.target.style.backgroundColor = currentSelectedField.style.backgroundColor;
 
-            if (keyToSKMap.has(e.target.getAttribute("data-bs-content")) && currentSelectedField.classList.contains("key")) {
-                currentSelectedField.parentElement.parentElement.children[1].firstElementChild.value = keyToSKMap.get(e.target.getAttribute("data-bs-content"));
+            if (keyToSKMap.has(e.target.getAttribute("data-bs-content").replaceAll(/[^a-zA-Z0-9]/g, "")) && currentSelectedField.classList.contains("key")) {
+                currentSelectedField.parentElement.parentElement.children[1].firstElementChild.value = keyToSKMap.get(e.target.getAttribute("data-bs-content").replaceAll(/[^a-zA-Z0-9]/g, ""));
             }
 
             currentSelectedField.dispatchEvent(new Event('focus'));
@@ -510,10 +510,14 @@ const handleChangeInStandardKey = (e) => {
     } else {
         e.target.classList.remove('invalid-input');
         e.target.classList.add('valid-input');
-        const kv = e.target.parentElement.parentElement.children[4].firstElementChild;
-        if (e.target.value !== "MISC" && kv.classList.contains("key") && kv.value !== undefined && kv.value !== null && kv.value !== "") {
-            const kbbox = document.getElementById("bbox_" + (parseInt(kv.value) + 1));
-            keyToSKMap.set(kbbox.getAttribute("data-bs-content"), e.target.value);
+        try {
+            const kv = e.target.parentElement.parentElement.children[4].firstElementChild;
+            if (e.target.value !== "MISC" && kv.classList.contains("key") && kv.value !== undefined && kv.value !== null && kv.value !== "") {
+                const kbbox = document.getElementById("bbox_" + (parseInt(kv.value) + 1));
+                keyToSKMap.set(kbbox.getAttribute("data-bs-content").replaceAll(/[^a-zA-Z0-9]/g, ""), e.target.value);
+            }
+        } catch (ex) {
+            console.log("Error while changing standard key: ", ex);
         }
     }
 };
