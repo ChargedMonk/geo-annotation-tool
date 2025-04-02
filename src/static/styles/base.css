@@ -312,3 +312,9 @@ label {
     color: white;
     font-weight: 900;
 }
+
+.selected-row {
+    background-color: rgba(63, 114, 175, 0.3);
+    border: 1px solid #3F72AF;
+    padding: auto;
+}

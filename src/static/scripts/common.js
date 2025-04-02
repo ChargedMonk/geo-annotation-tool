@@ -851,6 +851,13 @@ Array.from(fields_to_be_annotated).forEach(function (element) {
     element.addEventListener('focus', handleSelectField);
 });
 
+document.getElementById('key_value_tab').addEventListener('mousedown', function (e) {
+    const row = e.target.closest('.key_value');
+    if (row && !e.target.closest('.delete_key_value_btn') && !e.target.closest('.add_key_value_btn') && e.ctrlKey) {
+        row.classList.toggle('selected-row');
+    }
+});
+
 
 
 export { annotateImgBboxes, annotateImgWordBboxes, clearImageBBoxes, handleChangeInStandardKey, handleSelectField, standardKeyOptions, updateDrawArrows, deleteIds };
